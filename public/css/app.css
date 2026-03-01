@@ -1,0 +1,44 @@
+.bg-arc {
+    background-color: rgb(230, 49, 46)
+}
+
+
+.slot .slot-card {
+    border-radius: 12px;
+    transition: 0.2s ease-in-out;
+}
+
+.slot .slot-card:hover {
+    transform: translateY(-2px);
+}
+
+.slot .reserved {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.slot .full {
+    background-color: #e9ecef;
+    color: #6c757d;
+}
+
+.slot .locked {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+}
+
+.slot .timer {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #d9534f;
+}
+
+.slot .day-header {
+    font-weight: 600;
+}
+
+.modal-slot-reservation #countdown {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #d9534f;
+}

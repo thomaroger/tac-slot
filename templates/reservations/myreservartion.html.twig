@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<section class="py-4">
+<div class="row g-3">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 h-100 bg-success text-white">
+            <div class="card-body">
+                <h2 class="h5 mb-2 text-white">Nombre de réservations avec checkin</h2>
+                <p class="display-6 mb-1">
+                    {{reservation_count_with_checkin}}
+                </p>
+            </div>
+        </div>
+    </div>
+        <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h2 class="h5 mb-2">Nombre de réservations confirmées</h2>
+                <p class="display-6 mb-1">
+                    {{reservation_count_confirmed}}
+                </p>
+            </div>
+        </div>
+    </div>
+        <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 h-100 bg-warning">
+            <div class="card-body">
+                <h2 class="h5 mb-2">Nombre de réservations annulées</h2>
+                <p class="display-6 mb-1">
+                    {{reservation_count_cancelled}}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 h-100 bg-danger">
+            <div class="card-body">
+                <h2 class="h5 mb-2 text-white">Nombre de réservations non honorées</h2>
+                <p class="display-6 mb-1 text-white">
+                    {{reservation_count_noshow}}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 bg-success">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2 text-white">Taux de fiabilité global</h2>
+                        <p class="display-6 mb-1 text-white">
+                            {{((reservation_count_with_checkin /(reservation_count_noshow + reservation_count_with_checkin))*100)|round(2, 'floor')}}%                    
+                        </p>
+                        <p class="text-white mb-0">
+                            Pourcentage du nombre de reservation checkin par rapport au nombre de réservations confirmées
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 bg-danger">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2 text-white">Taux de No Show</h2>
+                        <p class="display-6 mb-1 text-white">
+                            {{((reservation_count_noshow /(reservation_count_noshow + reservation_count_with_checkin))*100)|round(2, 'floor')}}%  
+                        </p>
+                        <p class="text-white mb-0">
+                            Pourcentage du nombre de reservation avec un no-show par rapport au nombre de réservations confirmées
+                        </p>
+                    </div>
+                </div>
+            </div>
+            </div>
+    </section>
+
+
+
+<div class="container-fluid py-4">
+    <h2 class="mb-4 fw-bold">Mes réservations</h2>
+    <div class="card" style="">
+        <div class="card-body">
+            <h5 class="card-title">Réservations du {{start_of_day|date('l d F')}}</h5>
+            <hr />
+             {% for reservation in current_reservations %}
+                {% set cardClass = '' %}
+                    {% if reservation.status == 'confirmed' %} 
+                        {% set cardClass = 'bg-success text-white' %}
+                    {% elseif reservation.status == 'cancelled' %}
+                        {% set cardClass = 'bg-warning' %}
+                    {% elseif reservation.status == 'no_show' %}
+                        {% set cardClass = 'bg-danger' %}
+                    {% endif %}
+                    <div class="card {{ cardClass }} mt-2" id=''>
+                        <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ reservation.slot.startAt|date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
+                            </div>
+                            <div>
+                                <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
+                                {% if reservation.isCheckedIn == true %}
+                                    <span class="badge text-bg-danger">Checkin</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                {% endfor %}
+        </div>
+    </div>
+    <div class="clearfix">&nbsp;</div>
+    <div class="card" style="">
+        <div class="card-body">
+            <h5 class="card-title">Réservations futures</h5>
+            <hr />
+         {% for reservation in futur_reservations %}
+                {% set cardClass = '' %}
+                    {% if reservation.status == 'confirmed' %} 
+                        {% set cardClass = 'bg-success text-white' %}
+                    {% elseif reservation.status == 'cancelled' %}
+                        {% set cardClass = 'bg-warning' %}
+                    {% elseif reservation.status == 'no_show' %}
+                        {% set cardClass = 'bg-danger' %}
+                    {% endif %}
+                    <div class="card {{ cardClass }} mt-2" id=''>
+                        <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ reservation.slot.startAt|date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
+                            </div>
+                            <div>
+                                <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                {% endfor %}
+        
+        </div>
+    </div>
+    <div class="clearfix">&nbsp;</div>
+    <div class="card" style="">
+        <div class="card-body">
+            <h5 class="card-title">Réservations passées</h5>
+            <hr />
+            {% for reservation in past_reservations %}
+                {% set cardClass = '' %}
+                    {% if reservation.status == 'confirmed' %} 
+                        {% set cardClass = 'bg-success text-white' %}
+                    {% elseif reservation.status == 'cancelled' %}
+                        {% set cardClass = 'bg-warning' %}
+                    {% elseif reservation.status == 'no_show' %}
+                        {% set cardClass = 'bg-danger' %}
+                    {% endif %}
+                    <div class="card {{ cardClass }} mt-2" id=''>
+                        <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {{ reservation.slot.startAt|date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
+                            </div>
+                            <div>
+                                <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
+                                {% if reservation.isCheckedIn == true %}
+                                    <span class="badge text-bg-secondary">Checkin</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                {% endfor %}
+        </div>
+    </div>
+<div>
+{% endblock %}
+
+{% block javascripts %}
+{% endblock %}

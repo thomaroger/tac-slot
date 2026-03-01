@@ -1,0 +1,18 @@
+<p>Bonjour {{ adherent.firstName }} {{ adherent.lastName }},</p>
+
+<p>
+    Merci pour votre première connexion. Pour <strong>valider votre compte</strong>,
+    cliquez sur le lien ci-dessous :
+</p>
+
+<p>
+    <a href="{{ absolute_url(path('app_verify_email', { token: token })) }}">
+        Valider mon compte
+    </a>
+</p>
+<p>
+    Si vous n’êtes pas à l’origine de cette action, vous pouvez ignorer cet email.
+</p>
+<p>
+    Les Archers du Faucigny - Système de réservation tir libre
+</p>

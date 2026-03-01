@@ -1,0 +1,294 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container-fluid py-4">
+
+    {% if slotnow %}
+    <div class="alert alert-warning" role="alert">
+        <h4 class="alert-heading"><i class="fa-solid fa-map-pin"></i> <strong>Votre séance est en cours</strong></h4>
+        <p>Pensez à faire votre check-in.</p>
+        <form method="post" action="{{ path('reservation_check', {id: slotnow.id}) }}" class="float-end">
+            <input type="hidden" name="_token" value="{{ csrf_token('reservation_check_' ~ slotnow.id) }}">
+            <button class="btn btn-dark btn-sm" id="checkinBtn" type="submit">Check-in</button>
+        </form>
+        <div class="clearfix">&nbsp;</div>
+    </div>
+    {% endif %}
+
+    {% if slotopened == true %}
+        <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Salle ouverte !</h4>
+        <p><strong>{{slotReservations|length}} personne{% if slotReservations|length > 1 %}s{% endif %}</strong> présente{% if slotReservations|length > 1 %}s{% endif %} en salle sur <strong>{{slotResa}} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.</p>
+        <hr>
+        <p class="mb-0">
+            {% for slotReservation in slotReservations %}
+                {% if not loop.first %}, {% endif %}{{slotReservation.user.getFirstname()}} {{slotReservation.user.getLastname()}} {% if slotReservation.user.hasAirKey() %}<i class="fa-solid fa-key"></i>{% endif %}
+            {% endfor %}
+        </p>
+        </div>
+    {% endif %}
+    
+    {% if slotopened == false  %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Salle fermée !</h4>
+            <p>Aucun créneau n'est disponible à cette heure</p>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 fw-bold">Réservation des créneaux</h2>
+
+    <!-- Accordion horizontal -->
+    <div class="accordion" id="weekAccordion">
+        {% for day, slots in slotsByDay %}
+            {% set dayId = 'day' ~ loop.index %}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button {{ not loop.first ? 'collapsed' : '' }}" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#{{ dayId }}">
+                        {{ day|date('l d F')|upper }}
+                    </button>
+                </h2>
+                <div id="{{ dayId }}" 
+                     class="accordion-collapse collapse {{ loop.first ? 'show' : '' }}" 
+                     data-bs-parent="#weekAccordion">
+                    <div class="accordion-body">
+                        {% for slot in slots %}
+                            {% set remaining = slot.maxPlaces - slot.reservedPlaces %}
+                            {% set cardClass = 'card slot-card mb-3 p-3 rounded-3' %}
+                            {% if slot.isReservedBy(app.user) %}{% set cardClass = cardClass ~ ' reserved bg-success text-white' %}{% endif %}
+                            {% if slot.isReservedBy(app.user, 'pending') %}{% set cardClass = cardClass ~ ' reserved bg-warning' %}{% endif %}
+                            {% if slot.isClosed %}{% set cardClass = cardClass ~ ' bg-danger text-white' %}{% endif %}
+                            {% if remaining <= 0 and not slot.reservations %}{% set cardClass = cardClass ~ ' full bg-light' %}{% endif %}
+
+                            <div class="{{ cardClass }}" id='slot-{{slot.id}}'>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ slot.startAt|date('H:i') }} - {{ slot.endAt|date('H:i') }}</strong><br>
+                                       {% if slot.isReservedBy(app.user) %}
+                                            {{ remaining }} / {{ slot.maxPlaces }} places  
+                                                {% if slot.hasReservationWithAirKey %}
+                                                    - <i class="fa-solid fa-key">&nbsp;</i>AirKey Disponible
+                                                {% endif %} 
+                                                - Réservé <i class="fa-solid fa-check"></i>
+                                                {% if slot.isReservedByWithCheckIn(app.user) %}
+                                                    - Checkin <i class="fa-solid fa-map-pin"></i>
+                                                {% endif %} 
+                                                 
+                                        {% elseif remaining <= 0 %}
+                                            Complet <i class="fa-solid fa-people-pulling"></i>
+                                        {% else %}
+                                            {% if not slot.isClosed %}
+                                                {{ remaining }} / {{ slot.maxPlaces }} places  
+                                                {% if slot.hasReservationWithAirKey %}
+                                                    - <span class="text-success"><i class="fa-solid fa-key">&nbsp;</i>AirKey Disponible</span>
+                                                {% endif %}
+                                            {% else %}
+                                                Fermé <i class="fa-solid fa-lock"></i>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        {% if slot.isReservedBy(app.user)  %}
+                                            {% if slot.canBeCancelled %}
+                                            <button class="btn btn-danger btn-sm cancelledReservation" 
+                                                    data-slot-id="{{ slot.id }}" 
+                                                    data-action="cancel">Annuler</button>
+                                            {% else %}
+                                                <button class="btn btn-danger btn-sm" disabled>Annuler</button>
+                                            {% endif %}
+                                        {% else %}
+                                            {%if slot.isClosed %}
+                                                <button class="btn btn-sm" disabled>Fermé</button>
+                                            {% else %}
+                                            {% if remaining > 0 %}
+                                                {% if not user.hasAirKey and not slot.hasReservationWithAirKey %}
+                                                    <button class="btn btn-secondary btn-sm" disabled>AirKey nécessaire</button>
+                                                {% else %}
+                                                    {% if slot.isReservedBy(app.user, 'pending') %}
+                                                     <button class="btn btn-danger btn-sm" data-slot-id="{{slot.id}}" id="confirmReservation">A confirmer</button>
+                                                    {% else %}
+                                                    <button class="btn btn-success btn-sm" 
+                                                            data-slot-id="{{ slot.id }}" 
+                                                            data-action="reserve"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#reservationModal"
+                                                            data-slot-day="{{ day|date('l d F')|upper }}"
+                                                            data-slot-time="{{ slot.startAt|date('H:i') }} - {{ slot.endAt|date('H:i') }}"
+                                                            data-remaining="{{ remaining }}">Réserver</button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% elseif remaining == 0 %}
+                                                <button class="btn btn-secondary btn-sm" disabled>Complet</button>
+                                            {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal Réservation -->
+<div class="modal fade modal-slot-reservation" id="reservationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header border-1">
+                <h5 class="modal-title fw-bold">Confirmer la réservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p><strong id="slotDay"></strong><br /><span id="slotTime"></strong><hr /></p>
+                <p><strong>Places restantes : <span id="remainingPlaces"></span></strong></p>
+                <hr />   
+                <h6 class="">⏳ Il vous reste <span id="countdown">60</span> secondes pour confirmer votre réservation.</h6>
+                <hr />   
+                <p class="small"><span class="text-warning"><i class="fa-solid fa-check"></i>Annulation possible jusqu’à 30 min avant.</span><br />
+                <span class="text-success"><i class="fa-solid fa-check"></i> Check-in obligatoire à l'arrivée.</span><br />
+                <span class="text-danger"><i class="fa-solid fa-xmark"></i> Absence sans check-in = no show.</span></p>
+            </div>
+            <div class="modal-footer border-1">
+                <button type="button" class="btn btn-danger" data-slot-id="" id="cancelledReservation" data-bs-dismiss="modal">Annuler ma réservation</button>
+                <button type="button" class="btn btn-success" data-slot-id="" id="confirmReservation" >Confirmer ma réservation</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let countdown = 60;
+    let timerInterval;
+    let selectedSlot = null;
+    const csrfToken = '{{ csrf_token('slot_reserve') }}';
+
+    const reservationModalEl = document.getElementById('reservationModal');
+    const reservationModal = new bootstrap.Modal(reservationModalEl);
+
+    reservationModalEl.addEventListener('show.bs.modal', function(event) {
+        
+        
+        const button = event.relatedTarget;
+        selectedSlot = button.dataset.slotId;
+        document.getElementById('slotTime').innerText = button.dataset.slotTime;
+        document.getElementById('slotDay').innerText = button.dataset.slotDay;
+        document.getElementById('remainingPlaces').innerText = button.dataset.remaining;
+        document.getElementById('cancelledReservation').dataset.slotId  = selectedSlot;
+        document.getElementById('confirmReservation').dataset.slotId  = selectedSlot;
+
+
+        countdown = 60;
+        document.getElementById('countdown').innerText = countdown;
+        console.log('/slots/'+button.dataset.slotId+'/reserve/pending');
+        fetch('/slots/'+button.dataset.slotId+'/reserve/pending', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+        })
+        .then(response => response.json());
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            countdown--;
+            document.getElementById('countdown').innerText = countdown;
+            if(countdown <= 0){
+                clearInterval(timerInterval);
+                reservationModal.hide();
+                const button =  document.getElementById('cancelledReservation');
+                fetch('/slots/'+ button.dataset.slotId +'/reserve/cancelled', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } 
+                });
+            }
+        }, 1000);
+    });
+
+    document.getElementById('confirmReservation').addEventListener('click', () => {
+        clearInterval(timerInterval);
+        reservationModal.hide();
+        const button =  document.getElementById('confirmReservation');
+        fetch('/slots/'+ button.dataset.slotId +'/reserve/confirmed', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    });
+
+    document.getElementById('cancelledReservation').addEventListener('click', () => {
+        clearInterval(timerInterval);
+        reservationModal.hide();
+        const button =  document.getElementById('cancelledReservation');
+        fetch('/slots/'+ button.dataset.slotId +'/reserve/cancelled', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    });
+
+    document.querySelectorAll('.cancelledReservation').forEach(button => {
+
+        button.addEventListener('click', function () {
+
+            clearInterval(timerInterval);
+            reservationModal.hide();
+
+            fetch('/slots/' + this.dataset.slotId + '/reserve/cancelled', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+
+        });
+
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Importer des adhérents{% endblock %}
+
+{% block body %}
+    <section class="py-4">
+        <h1 class="h3 mb-3">Import des adhérents / licenciés</h1>
+
+        <p class="text-muted">
+            Importez un fichier <strong>CSV</strong> (vous pouvez l’exporter depuis Excel)
+            avec les colonnes suivantes&nbsp;:
+        </p>
+        <ul>
+            <li><code>Prenom</code> ou <code>Prénom</code></li>
+            <li><code>Nom</code></li>
+            <li><code>Numero de licence</code> ou <code>Numéro de licence</code></li>
+            <li><code>Email</code></li>
+            <li><code>Niveau</code> (National, Régional, Départemental, Débutant/Loisirs, Droit de Paille)</li>
+            <li><code>Air key</code> (oui/non)</li>
+            <li><code>Role</code> ou <code>Rôle</code> (utilisateur, administrateur)</li>
+        </ul>
+
+        <p class="text-muted">
+            Les lignes sont <strong>créées ou mises à jour</strong> à partir du
+            <strong>numéro de licence</strong>.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" class="mt-3">
+            <div class="mb-3">
+                <label for="import_file" class="form-label">Fichier CSV</label>
+                <input type="file" name="import_file" id="import_file" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Importer</button>
+            <a href="{{ path('admin') }}" class="btn btn-outline-secondary">Retour au tableau de bord</a>
+        </form>
+    </section>
+{% endblock %}
+

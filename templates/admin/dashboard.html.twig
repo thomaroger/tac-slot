@@ -1,0 +1,542 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+{% block content_title %}{{ page_title }}{% endblock %}
+{% block main %}
+    <section class="py-4">
+        <h1 class="h3 mb-3">Tableau de bord global</h1>
+        <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Adhérents</h2>
+                        <p class="display-6 mb-1">
+                            {{ adherents_count ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de licenciés total.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Créneaux</h2>
+                        <p class="display-6 mb-1">
+                            {{ slot_count ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de créneaux total.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Réservations</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservations total.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 bg-success text-white">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2 text-white">Nombre de réservations avec checkin</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_with_checkin ?? 0 }}
+                        </p>
+                        <p class="text-white mb-0">
+                            Nombre total de réservation avec checkin à la salle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+             <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 bg-success">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2 text-white">Nombre de réservations confirmées</h2>
+                        <p class="display-6 mb-1 text-white">
+                            {{ reservation_count_confirmed ?? 0 }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+             <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 bg-warning">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de réservations annulées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_cancelled ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservations annulées par l'adhérent.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 bg-danger">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2 text-white">Nombre de réservations non honorées</h2>
+                        <p class="display-6 mb-1 text-white">
+                            {{ reservation_count_noshow ?? 0 }}
+                        </p>
+                        <p class="text-white mb-0">
+                            Nombre de réservations confirmées sans checkin à la salle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre moyen de réservations confirmées par adhérent</h2>
+                        <p class="display-6 mb-1">
+                            {{ (reservation_count_confirmed/adherents_active_count)|round(2, 'floor')  }}
+                        </p>
+                        <p class="text-muted mb-0">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Taux de fiabilité global</h2>
+                        <p class="display-6 mb-1">
+                            {{ ((reservation_count_with_checkin/(reservation_count_noshow+reservation_count_with_checkin))*100)|round(2, 'floor')  }}%
+                        </p>
+                        <p class="text-muted mb-0">
+                            Pourcentage du nombre de reservation checkin par rapport au nombre de réservations confirmées
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Taux de No Show</h2>
+                        <p class="display-6 mb-1">
+                            {{ ((reservation_count_noshow/(reservation_count_noshow+reservation_count_with_checkin))*100)|round(2, 'floor')  }}%
+                        </p>
+                        <p class="text-muted mb-0">
+                            Pourcentage du nombre de reservation avec un no-show par rapport au nombre de réservations confirmées
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-4">
+        <h1 class="h3 mb-3">KPIs Aujourd'hui</h1>
+        <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de créneaux aujourd'hui</h2>
+                        <p class="display-6 mb-1">
+                            {{ slot_count_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de créneaux aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_confirmed_count_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation confirmée aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_cancelled_count_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation annulée aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations en cours</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_pending_count_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation en cours aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de réservations non honorées (No-Show)</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_noshow_count_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation non honorée aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérent ayant réservé un créneau</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_adherent_today ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            NNombre d'adhérent ayant réservé un creneau aujourd'hui
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Taux de remplissage</h2>
+                        <p class="display-6 mb-1">
+                            {{tx_resa_today|round(2, 'floor') }} %
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de personnes présentes par rapport au nombre de places disponible
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-4">
+        <h1 class="h3 mb-3">KPIs sur les 7 derniers jours</h1>
+        <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de créneaux sur les 7 derniers jours</h2>
+                        <p class="display-6 mb-1">
+                            {{ slot_count_7 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de créneaux sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_7 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_confirmed_count_7 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation confirmée sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_cancelled_count_7 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation annulée sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de réservations non honorées (No-Show)</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_noshow_count_7 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation non honorée sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Taux de remplissage</h2>
+                        <p class="display-6 mb-1">
+                            {{tx_resa_7|round(2, 'floor') }} %
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de personnes présentes par rapport au nombre de places disponible
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérent ayant réservé un créneau</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_adherent_7 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre d'adhérent ayant réservé un creneau sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">TOP 5 des créneaux</h2>
+                        <p class="mb-1 text-muted text-center">
+                            {% for date, value in slot_with_number_of_reservation_top5 %}
+                                {{date}} : <strong>{{value}} réservations</strong> <br />
+                            {% endfor %}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Les 5 créneaux les plus réservés sur les 7 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-4">
+        <h1 class="h3 mb-3">KPIs sur les 30 derniers jours</h1>
+        <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de créneaux sur les 30 derniers jours</h2>
+                        <p class="display-6 mb-1">
+                            {{ slot_count_30 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de créneaux sur les 30 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_30 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation sur les 30 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_confirmed_count_30 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation confirmée sur les 30 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_cancelled_count_30 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation annulée sur les 30 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de réservations non honorées (No-Show)</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_noshow_count_30 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservation non honorée sur les 30 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Taux de remplissage</h2>
+                        <p class="display-6 mb-1">
+                            {{tx_resa_30|round(2, 'floor') }} %
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de personnes présentes par rapport au nombre de places disponible
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérent ayant réservé un créneau</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_adherent_30 ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            NNombre d'adhérent ayant réservé un creneau sur les 30 derniers jours
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-4">
+        <h1 class="h3 mb-3">KPIs Adhérents</h1>
+        <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérents actifs</h2>
+                        <p class="display-6 mb-1">
+                         {{ adherents_active_count ?? 0 }} / {{ adherents_count ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de licenciés actifs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérents avec le AirKey</h2>
+                        <p class="display-6 mb-1">
+                            {{ adherents_has_airkey ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérents pouvant faire du tir libre</h2>
+                        <p class="display-6 mb-1">
+                            {{ adherents_can_open_shoot ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérents supprimés</h2>
+                        <p class="display-6 mb-1">
+                            {{ adherents_delete_count ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre d'adhérents supprimés
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">TOP 5 des adhérents les plus fiables</h2>
+                        <p class="mb-1 text-muted text-center">
+                            {% for adherent in top5_adherents %}
+                                {{adherent.firstName}} {{adherent.lastName}} : <strong>{{(adherent.ratio*100)|round(2, 'floor')}} %</strong> <br />
+                            {% endfor %}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Ratio entre les reservations qui ont été checkin par rapport au nombre de réservations confirmées
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">TOP 5 des adhérents les moins fiables</h2>
+                        <p class="mb-1 text-muted text-center">
+                           {% for adherent in bad5_adherents %}
+                                {{adherent.firstName}} {{adherent.lastName}} : <strong>{{(adherent.ratio*100)|round(2, 'floor')}} %</strong> <br />
+                            {% endfor %}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Ratio entre les reservations qui ont été checkin par rapport au nombre de réservations confirmées
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+

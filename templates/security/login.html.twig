@@ -1,0 +1,43 @@
+{% extends 'base.login.html.twig' %}
+
+{% block body %}
+	<div class="form-signin w-100 m-auto text-center">
+		<a href="/" style="color:black;text-decoration:none">
+			<p style="line-height:40px;">
+				<b>Les Archers du Faucigny - Système de réservation tir libre</b>
+			</p>
+		</a>
+
+         {% if slotopened == true %}
+            <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Salle ouverte !</h4>
+            <p><strong>{{slotCheckIn}} personne{% if slotCheckIn > 1 %}s{% endif %}</strong> présente{% if slotCheckIn > 1 %}s{% endif %} en salle sur <strong>{{slotResa}} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.</p>
+            
+           
+            
+            </div>
+        {% endif %}
+        
+        {% if slotopened == false  %}
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Salle fermée !</h4>
+                <p>Aucun créneau n'est disponible à cette heure</p>
+            </div>
+        {% endif %}
+
+
+		<form action="{{ path('app_login') }}" method="post">
+			<div class="form-floating">
+                <input type="text" name="identifier" id="identifier" class="form-control" required autofocus>
+				<label for="identifier">Saisissez votre <strong>numéro de licence</strong> ou votre <strong>adresse email</strong>.</label>
+			</div>
+			<div class="clearfix">&nbsp;</div>
+			
+			<div class="clearfix">&nbsp;</div>
+			<button class="w-100 btn btn-lg btn-primary" type="submit">Recevoir un code</button>
+		</form>
+	</div>
+{% endblock %}
+
+
+
