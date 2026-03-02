@@ -24,7 +24,7 @@ class HomeService
     public function buildHomeData(Adherent $user): array
     {
         $today = new \DateTimeImmutable('today');
-        $todayPlus4 = new \DateTimeImmutable('+4 days');
+        $todayPlus4 = new \DateTimeImmutable('+13 days');
         $limit = $today->modify('+14 days');
 
         if (! $this->slotRepository->hasAnySlotBetween($todayPlus4, $limit)) {

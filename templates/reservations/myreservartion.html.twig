@@ -1,7 +1,6 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-
 <section class="py-4">
 <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-4">
@@ -79,7 +78,7 @@
     <h2 class="mb-4 fw-bold">Mes réservations</h2>
     <div class="card" style="">
         <div class="card-body">
-            <h5 class="card-title">Réservations du {{start_of_day|date('l d F')}}</h5>
+            <h5 class="card-title">Réservations du {{ start_of_day|fr_date('l d F') }}</h5>
             <hr />
              {% for reservation in current_reservations %}
                 {% set cardClass = '' %}
@@ -94,7 +93,7 @@
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                {{ reservation.slot.startAt|date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
+                                {{ reservation.slot.startAt|fr_date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
                             </div>
                             <div>
                                 <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
@@ -126,7 +125,7 @@
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                {{ reservation.slot.startAt|date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
+                                {{ reservation.slot.startAt|fr_date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
                             </div>
                             <div>
                                 <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
@@ -156,7 +155,7 @@
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                {{ reservation.slot.startAt|date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
+                                {{ reservation.slot.startAt|fr_date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
                             </div>
                             <div>
                                 <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>

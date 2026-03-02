@@ -8,6 +8,7 @@ use App\Entity\Adherent;
 use App\Entity\Reservation;
 use App\Entity\Slot;
 use App\Repository\ReservationRepository;
+use App\Util\FrenchDateFormatter;
 use Doctrine\ORM\EntityManagerInterface;
 
 class SlotReservationService
@@ -68,11 +69,12 @@ class SlotReservationService
                 'success' => true,
                 'message' => 'ok',
                 'flashType' => 'warning',
-                'flashMessage' => 'Le créneau du ' . $slot->getStartAt()->format(
+                'flashMessage' => 'Le créneau du ' . FrenchDateFormatter::format(
+                    $slot->getStartAt(),
                     'l d F'
-                ) . ' ' . $slot->getStartAt()->format(
+                ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' - ' . $slot->getEndAt()->format('H:i') . ' a été pré-réservé',
+                ) . ' a été pré-réservé',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -97,11 +99,12 @@ class SlotReservationService
                 'success' => true,
                 'message' => 'ok',
                 'flashType' => 'success',
-                'flashMessage' => 'Le créneau du ' . $slot->getStartAt()->format(
+                'flashMessage' => 'Le créneau du ' . FrenchDateFormatter::format(
+                    $slot->getStartAt(),
                     'l d F'
-                ) . ' ' . $slot->getStartAt()->format(
+                ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' - ' . $slot->getEndAt()->format('H:i') . ' a été réservé',
+                ) . ' a été réservé',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -135,11 +138,12 @@ class SlotReservationService
                 'success' => true,
                 'message' => 'ok',
                 'flashType' => 'danger',
-                'flashMessage' => 'La réservation du créneau du ' . $slot->getStartAt()->format(
+                'flashMessage' => 'La réservation du créneau du ' . FrenchDateFormatter::format(
+                    $slot->getStartAt(),
                     'l d F'
-                ) . ' ' . $slot->getStartAt()->format(
+                ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' - ' . $slot->getEndAt()->format('H:i') . ' a été annulé',
+                ) . ' a été annulé',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }

@@ -17,9 +17,11 @@
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         {% block stylesheets %}{% endblock %}
     </head>
-    <body class="bg-light">
-        <main class="container mb-5">
-            {% block body %}{% endblock %}
+    <body class="bg-light d-flex flex-column min-vh-100">
+        <main class="container flex-grow-1 d-flex align-items-center justify-content-center">
+            <div class="w-100" style="max-width: 700px;">
+                {% block body %}{% endblock %}
+            </div>
             <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
                 {% for label, messages in app.flashes %}
                     {% for message in messages %}

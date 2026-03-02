@@ -26,6 +26,7 @@ class HomeController extends AbstractController
         }
 
         $result = $this->homeService->buildHomeData($user);
+
         if ($result['redirectRoute'] !== null) {
             return $this->redirectToRoute($result['redirectRoute']);
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Util\FrenchDateFormatter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -177,8 +178,7 @@ class Slot
 
     public function toStringForTwig(): string
     {
-        return $this->getStartAt()
-            ->format('l d F H:i') . ' - ' . $this->getEndAt()->format('H:i');
+        return FrenchDateFormatter::format($this->getStartAt(), 'l d F H:i') . ' - ' . $this->getEndAt()->format('H:i');
 
     }
 

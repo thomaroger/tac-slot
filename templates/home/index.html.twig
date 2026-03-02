@@ -47,7 +47,7 @@
                             type="button" 
                             data-bs-toggle="collapse" 
                             data-bs-target="#{{ dayId }}">
-                        {{ day|date('l d F')|upper }}
+                        {{ day|fr_date('l d F')|upper }}
                     </button>
                 </h2>
                 <div id="{{ dayId }}" 
@@ -114,7 +114,7 @@
                                                             data-action="reserve"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#reservationModal"
-                                                            data-slot-day="{{ day|date('l d F')|upper }}"
+                                                            data-slot-day="{{ day|fr_date('l d F')|upper }}"
                                                             data-slot-time="{{ slot.startAt|date('H:i') }} - {{ slot.endAt|date('H:i') }}"
                                                             data-remaining="{{ remaining }}">Réserver</button>
                                                     {% endif %}
