@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Service\SlotGenerationService;
@@ -18,7 +20,7 @@ class SlotGeneratorController extends AbstractController
     public function generate(): Response
     {
         $numberOfSlots = $this->slotGenerationService->generateSlotsForNext14Days();
-        $this->addFlash('success', $numberOfSlots.' créneaux générés avec succès.');
+        $this->addFlash('success', $numberOfSlots . ' créneaux générés avec succès.');
 
         return $this->redirectToRoute('app_home');
     }

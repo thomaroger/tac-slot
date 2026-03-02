@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use DateTimeImmutable;
@@ -30,7 +32,9 @@ class Adherent implements UserInterface
     #[ORM\Column(length: 30)]
     private ?string $level = null;
 
-    #[ORM\Column(options: ['default' => false])]
+    #[ORM\Column(options: [
+        'default' => false,
+    ])]
     private bool $airKey = false;
 
     #[ORM\Column(length: 30)]
@@ -45,7 +49,9 @@ class Adherent implements UserInterface
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?DateTimeInterface $deletedAt = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[ORM\Column(type: 'boolean', options: [
+        'default' => false,
+    ])]
     private bool $emailVerified = false;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -54,13 +60,19 @@ class Adherent implements UserInterface
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $emailVerificationTokenExpiresAt = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[ORM\Column(type: 'boolean', options: [
+        'default' => false,
+    ])]
     private bool $canOpenShoot = false;
-
 
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getId() . ' - ' . $this->getFirstName() . ' ' . $this->getLastName();
     }
 
     public function getId(): ?int
@@ -190,7 +202,7 @@ class Adherent implements UserInterface
 
     public function isDeleted(): bool
     {
-        return null !== $this->deletedAt;
+        return $this->deletedAt !== null;
     }
 
     public function isEmailVerified(): bool
@@ -204,7 +216,6 @@ class Adherent implements UserInterface
 
         return $this;
     }
-
 
     public function isCanOpenShoot(): bool
     {
@@ -258,13 +269,8 @@ class Adherent implements UserInterface
         return array_values(array_unique($roles));
     }
 
-    public function __toString(): string
-    {
-        return $this->getId() . ' - ' . $this->getFirstName() . ' ' . $this->getLastName();
-    }
-
     public function eraseCredentials(): void
     {
-        // TODO: Implement eraseCredentials() method.
+
     }
 }

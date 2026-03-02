@@ -62,9 +62,9 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "cs-check": "ecs check src config migrations",
-        "cs-fix": "ecs check src config migrations --fix",
-        "cs-check-dry": "ecs check src config migrations --dry-run"
+        "cs-check": "vendor/bin/ecs check src config migrations",
+        "cs-fix": "vendor/bin/ecs check src config migrations --fix",
+        "cs-check-dry": "vendor/bin/ecs check src config migrations --dry-run"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -76,6 +76,7 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.66"
+        "symfony/maker-bundle": "^1.66",
+        "symplify/easy-coding-standard": "^13.0"
     }
 }

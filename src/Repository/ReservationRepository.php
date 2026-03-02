@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Adherent;
@@ -18,8 +20,11 @@ class ReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reservation::class);
     }
 
-    public function getReservationBySlotAndUser(Slot $slot, Adherent $user, string|array $status = Reservation::STATUS_PENDING): ?Reservation
-    {
+    public function getReservationBySlotAndUser(
+        Slot $slot,
+        Adherent $user,
+        string|array $status = Reservation::STATUS_PENDING
+    ): ?Reservation {
         $qb = $this->createQueryBuilder('r')
             ->where('r.user = :user')
             ->andWhere('r.slot = :slot')
@@ -35,7 +40,8 @@ class ReservationRepository extends ServiceEntityRepository
                 ->setParameter('status', $status);
         }
 
-        return $qb->getQuery()->getOneOrNullResult();
+        return $qb->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
@@ -68,8 +74,10 @@ class ReservationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findCurrentUncheckedConfirmedReservationForUser(Adherent $user, \DateTimeImmutable $now): ?Reservation
-    {
+    public function findCurrentUncheckedConfirmedReservationForUser(
+        Adherent $user,
+        \DateTimeImmutable $now
+    ): ?Reservation {
         return $this->createQueryBuilder('r')
             ->join('r.slot', 's')
             ->addSelect('s')
@@ -210,8 +218,11 @@ class ReservationRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function countReservedAtInWindow(\DateTimeImmutable $start, \DateTimeImmutable $end, ?string $status = null): int
-    {
+    public function countReservedAtInWindow(
+        \DateTimeImmutable $start,
+        \DateTimeImmutable $end,
+        ?string $status = null
+    ): int {
         $qb = $this->createQueryBuilder('r')
             ->select('COUNT(r.id)')
             ->where('r.reservedAt >= :start')
@@ -219,12 +230,13 @@ class ReservationRepository extends ServiceEntityRepository
             ->setParameter('start', $start)
             ->setParameter('end', $end);
 
-        if (null !== $status) {
+        if ($status !== null) {
             $qb->andWhere('r.status = :status')
                 ->setParameter('status', $status);
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()
+            ->getSingleScalarResult();
     }
 
     public function countCancelledAtInWindow(\DateTimeImmutable $start, \DateTimeImmutable $end): int
@@ -258,8 +270,10 @@ class ReservationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function countDistinctAdherentsWithReservationsInWindow(\DateTimeImmutable $start, \DateTimeImmutable $end): int
-    {
+    public function countDistinctAdherentsWithReservationsInWindow(
+        \DateTimeImmutable $start,
+        \DateTimeImmutable $end
+    ): int {
         return (int) $this->createQueryBuilder('r')
             ->select('COUNT(DISTINCT u.id)')
             ->join('r.user', 'u')

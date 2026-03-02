@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Adherent;
@@ -66,14 +68,18 @@ class SlotReservationService
                 'success' => true,
                 'message' => 'ok',
                 'flashType' => 'warning',
-                'flashMessage' => 'Le créneau du '.$slot->getStartAt()->format('l d F').' '.$slot->getStartAt()->format('H:i').' - '.$slot->getEndAt()->format('H:i').' a été pré-réservé',
+                'flashMessage' => 'Le créneau du ' . $slot->getStartAt()->format(
+                    'l d F'
+                ) . ' ' . $slot->getStartAt()->format(
+                    'H:i'
+                ) . ' - ' . $slot->getEndAt()->format('H:i') . ' a été pré-réservé',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
 
         if ($status === Reservation::STATUS_CONFIRMED) {
             $reservation = $this->reservationRepository->getReservationBySlotAndUser($slot, $user);
-            if (!$reservation instanceof Reservation) {
+            if (! $reservation instanceof Reservation) {
                 return [
                     'success' => false,
                     'message' => 'reservation introuvable',
@@ -91,7 +97,11 @@ class SlotReservationService
                 'success' => true,
                 'message' => 'ok',
                 'flashType' => 'success',
-                'flashMessage' => 'Le créneau du '.$slot->getStartAt()->format('l d F').' '.$slot->getStartAt()->format('H:i').' - '.$slot->getEndAt()->format('H:i').' a été réservé',
+                'flashMessage' => 'Le créneau du ' . $slot->getStartAt()->format(
+                    'l d F'
+                ) . ' ' . $slot->getStartAt()->format(
+                    'H:i'
+                ) . ' - ' . $slot->getEndAt()->format('H:i') . ' a été réservé',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -103,7 +113,7 @@ class SlotReservationService
                 [Reservation::STATUS_CONFIRMED, Reservation::STATUS_PENDING]
             );
 
-            if (!$reservation instanceof Reservation) {
+            if (! $reservation instanceof Reservation) {
                 return [
                     'success' => false,
                     'message' => 'reservation introuvable',
@@ -125,7 +135,11 @@ class SlotReservationService
                 'success' => true,
                 'message' => 'ok',
                 'flashType' => 'danger',
-                'flashMessage' => 'La réservation du créneau du '.$slot->getStartAt()->format('l d F').' '.$slot->getStartAt()->format('H:i').' - '.$slot->getEndAt()->format('H:i').' a été annulé',
+                'flashMessage' => 'La réservation du créneau du ' . $slot->getStartAt()->format(
+                    'l d F'
+                ) . ' ' . $slot->getStartAt()->format(
+                    'H:i'
+                ) . ' - ' . $slot->getEndAt()->format('H:i') . ' a été annulé',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }

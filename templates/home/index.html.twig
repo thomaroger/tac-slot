@@ -107,7 +107,7 @@
                                                     <button class="btn btn-secondary btn-sm" disabled>AirKey nécessaire</button>
                                                 {% else %}
                                                     {% if slot.isReservedBy(app.user, 'pending') %}
-                                                     <button class="btn btn-danger btn-sm" data-slot-id="{{slot.id}}" id="confirmReservation">A confirmer</button>
+                                                        <button class="btn btn-danger btn-sm confirmReservationSincePending" data-slot-id="{{slot.id}}">A confirmer</button>
                                                     {% else %}
                                                     <button class="btn btn-success btn-sm" 
                                                             data-slot-id="{{ slot.id }}" 
@@ -141,7 +141,7 @@
         <div class="modal-content rounded-4">
             <div class="modal-header border-1">
                 <h5 class="modal-title fw-bold">Confirmer la réservation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" id="btn-close-modal" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
                 <p><strong id="slotDay"></strong><br /><span id="slotTime"></strong><hr /></p>
@@ -175,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     reservationModalEl.addEventListener('show.bs.modal', function(event) {
         
-        
         const button = event.relatedTarget;
         selectedSlot = button.dataset.slotId;
         document.getElementById('slotTime').innerText = button.dataset.slotTime;
@@ -187,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         countdown = 60;
         document.getElementById('countdown').innerText = countdown;
-        console.log('/slots/'+button.dataset.slotId+'/reserve/pending');
         fetch('/slots/'+button.dataset.slotId+'/reserve/pending', {
             method: 'POST',
             headers: {
@@ -264,13 +262,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+
     document.querySelectorAll('.cancelledReservation').forEach(button => {
-
         button.addEventListener('click', function () {
-
             clearInterval(timerInterval);
             reservationModal.hide();
-
             fetch('/slots/' + this.dataset.slotId + '/reserve/cancelled', {
                 method: 'POST',
                 headers: {
@@ -285,10 +281,35 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.location.reload();
                 }
             });
-
         });
-
     });
+
+
+    document.querySelectorAll('.confirmReservationSincePending').forEach(button => {
+        button.addEventListener('click', function () {
+            clearInterval(timerInterval);
+            fetch('/slots/'+ this.dataset.slotId +'/reserve/confirmed', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+        window.location.reload();
+    });
+
+
 });
 </script>
 {% endblock %}

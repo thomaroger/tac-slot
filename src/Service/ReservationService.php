@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Adherent;
@@ -18,7 +20,9 @@ class ReservationService
     public function cleanExpiredPendingReservations(): int
     {
         $numberOfReservations = 0;
-        $expiredReservations = $this->reservationRepository->findExpiredPendingReservations(new \DateTimeImmutable('-2 minutes'));
+        $expiredReservations = $this->reservationRepository->findExpiredPendingReservations(
+            new \DateTimeImmutable('-2 minutes')
+        );
 
         foreach ($expiredReservations as $reservation) {
             $slot = $reservation->getSlot();
@@ -77,14 +81,33 @@ class ReservationService
         return [
             'user' => $user,
             'start_of_day' => $startOfDay,
-            'current_reservations' => $this->reservationRepository->findCurrentDayReservationsForUser($user, $startOfDay, $startOfTomorrow),
-            'futur_reservations' => $this->reservationRepository->findFutureReservationsForUser($user, $startOfTomorrow),
+            'current_reservations' => $this->reservationRepository->findCurrentDayReservationsForUser(
+                $user,
+                $startOfDay,
+                $startOfTomorrow
+            ),
+            'futur_reservations' => $this->reservationRepository->findFutureReservationsForUser(
+                $user,
+                $startOfTomorrow
+            ),
             'past_reservations' => $this->reservationRepository->findPastReservationsForUser($user, $startOfDay),
             'reservation_count_with_checkin' => $this->reservationRepository->countCheckedInForUser($user),
-            'reservation_count_confirmed' => $this->reservationRepository->countByStatusForUser($user, Reservation::STATUS_CONFIRMED),
-            'reservation_count_cancelled' => $this->reservationRepository->countByStatusForUser($user, Reservation::STATUS_CANCELLED),
-            'reservation_count_noshow' => $this->reservationRepository->countByStatusForUser($user, Reservation::STATUS_NO_SHOW),
-            'past_count_reservations_confirmed' => $this->reservationRepository->countPastConfirmedReservationsForUser($user, $startOfDay),
+            'reservation_count_confirmed' => $this->reservationRepository->countByStatusForUser(
+                $user,
+                Reservation::STATUS_CONFIRMED
+            ),
+            'reservation_count_cancelled' => $this->reservationRepository->countByStatusForUser(
+                $user,
+                Reservation::STATUS_CANCELLED
+            ),
+            'reservation_count_noshow' => $this->reservationRepository->countByStatusForUser(
+                $user,
+                Reservation::STATUS_NO_SHOW
+            ),
+            'past_count_reservations_confirmed' => $this->reservationRepository->countPastConfirmedReservationsForUser(
+                $user,
+                $startOfDay
+            ),
         ];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\AuthCode;
@@ -32,8 +34,11 @@ class AuthCodeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findOneLoginCodeForSession(string $sessionId, \App\Entity\Adherent $adherent, string $code): ?AuthCode
-    {
+    public function findOneLoginCodeForSession(
+        string $sessionId,
+        \App\Entity\Adherent $adherent,
+        string $code
+    ): ?AuthCode {
         return $this->createQueryBuilder('ac')
             ->where('ac.sessionId = :sessionId')
             ->andWhere('ac.adherent = :adherent')

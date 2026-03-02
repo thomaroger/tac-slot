@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Adherent;
@@ -19,12 +21,12 @@ class HomeController extends AbstractController
     public function index(): Response
     {
         $user = $this->getUser();
-        if (!$user instanceof Adherent) {
+        if (! $user instanceof Adherent) {
             return $this->redirectToRoute('app_login');
         }
 
         $result = $this->homeService->buildHomeData($user);
-        if (null !== $result['redirectRoute']) {
+        if ($result['redirectRoute'] !== null) {
             return $this->redirectToRoute($result['redirectRoute']);
         }
 

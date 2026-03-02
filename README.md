@@ -1,11 +1,25 @@
-# TAC-Slkot
+# TAC-Slot
 
-
+TAC-Slot est une application de gestion des créneaux de tir libre pour un club.
+Elle permet aux adhérents de se connecter via un code reçu par email, de réserver un créneau, de confirmer leur présence (check-in) et de suivre leurs réservations.
+Un espace d’administration permet de piloter les adhérents, les créneaux, les réservations et les indicateurs d’activité.
 
 ---
 
 ## 🚀 Fonctionnalités
 
+- Connexion sans mot de passe via code OTP envoyé par email
+- Vérification d’email au premier accès
+- Réservation de créneaux avec pré-réservation puis confirmation
+- Annulation de réservation selon les règles définies
+- Check-in à l’arrivée en séance
+- Détection et marquage des no-show
+- Génération automatique des créneaux sur une période glissante
+- Affichage de l’état de la salle (ouverte/fermée, présents, inscrits)
+- Espace “Mes réservations” (du jour, futures, passées)
+- Tableau de bord administrateur avec statistiques
+- Gestion CRUD des adhérents, créneaux, réservations et journaux d’authentification
+- Import CSV des adhérents depuis l’interface admin
 
 ---
 

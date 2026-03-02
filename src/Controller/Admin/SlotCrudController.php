@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Slot;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -22,7 +24,9 @@ class SlotCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Créneau')
             ->setEntityLabelInPlural('Créneaux')
-            ->setDefaultSort(['startAt' => 'ASC'])
+            ->setDefaultSort([
+                'startAt' => 'ASC',
+            ])
             ->setPaginatorPageSize(30);
     }
 

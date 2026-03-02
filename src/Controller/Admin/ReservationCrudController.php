@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Reservation;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 
 class ReservationCrudController extends AbstractCrudController
 {
@@ -24,7 +25,9 @@ class ReservationCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Réservation')
             ->setEntityLabelInPlural('Réservations')
-            ->setDefaultSort(['reservedAt' => 'DESC'])
+            ->setDefaultSort([
+                'reservedAt' => 'DESC',
+            ])
             ->setPaginatorPageSize(30);
     }
 
@@ -34,16 +37,16 @@ class ReservationCrudController extends AbstractCrudController
             AssociationField::new('slot', 'Créneau'),
             AssociationField::new('user', 'Adhérent'),
             ChoiceField::new('status', 'Statut')
-                ->setChoices(array(
+                ->setChoices([
                     Reservation::STATUS_CONFIRMED => Reservation::STATUS_CONFIRMED,
                     Reservation::STATUS_PENDING => Reservation::STATUS_PENDING,
                     Reservation::STATUS_CANCELLED => Reservation::STATUS_CANCELLED,
-                    Reservation::STATUS_NO_SHOW => Reservation::STATUS_NO_SHOW
-                ))
+                    Reservation::STATUS_NO_SHOW => Reservation::STATUS_NO_SHOW,
+                ])
                 ->renderExpanded(false)
                 ->renderAsBadges(),
             BooleanField::new('checkedIn', 'Checked ?'),
-            
+
             DateTimeField::new('reservedAt', 'Réservé le'),
             DateTimeField::new('checkedInAt', 'Checké le'),
             DateTimeField::new('cancelledAt', 'Annulé le'),

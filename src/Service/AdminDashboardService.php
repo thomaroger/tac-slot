@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Reservation;
@@ -92,11 +94,26 @@ class AdminDashboardService
     ): array {
         $slotCount = $this->slotRepository->countByStartAtWindow($start, $end);
         $reservationCount = $this->reservationRepository->countReservedAtInWindow($start, $end);
-        $reservationConfirmedCount = $this->reservationRepository->countReservedAtInWindow($start, $end, Reservation::STATUS_CONFIRMED);
+        $reservationConfirmedCount = $this->reservationRepository->countReservedAtInWindow(
+            $start,
+            $end,
+            Reservation::STATUS_CONFIRMED
+        );
         $reservationCancelledCount = $this->reservationRepository->countCancelledAtInWindow($start, $end);
-        $reservationPendingCount = $this->reservationRepository->countReservedAtInWindow($start, $end, Reservation::STATUS_PENDING);
-        $reservationNoShowCount = $this->reservationRepository->countReservedAtInWindow($start, $end, Reservation::STATUS_NO_SHOW);
-        $reservationCountAdherent = $this->reservationRepository->countDistinctAdherentsWithReservationsInWindow($start, $end);
+        $reservationPendingCount = $this->reservationRepository->countReservedAtInWindow(
+            $start,
+            $end,
+            Reservation::STATUS_PENDING
+        );
+        $reservationNoShowCount = $this->reservationRepository->countReservedAtInWindow(
+            $start,
+            $end,
+            Reservation::STATUS_NO_SHOW
+        );
+        $reservationCountAdherent = $this->reservationRepository->countDistinctAdherentsWithReservationsInWindow(
+            $start,
+            $end
+        );
 
         $slots = $this->slotRepository->findSlotsInWindowWithReservations($start, $end);
         $maxPlaces = 0;
@@ -114,7 +131,7 @@ class AdminDashboardService
                 $confirmedReservations++;
 
                 if ($withTopSlots) {
-                    if (!isset($slotWithNumberOfReservation[$slot->toStringForTwig()])) {
+                    if (! isset($slotWithNumberOfReservation[$slot->toStringForTwig()])) {
                         $slotWithNumberOfReservation[$slot->toStringForTwig()] = 0;
                     }
                     $slotWithNumberOfReservation[$slot->toStringForTwig()]++;

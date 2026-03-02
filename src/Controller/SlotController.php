@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Adherent;
 use App\Entity\Slot;
 use App\Service\SlotReservationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SlotController extends AbstractController
@@ -21,7 +23,7 @@ class SlotController extends AbstractController
     public function reserve(Slot $slot, string $status, Request $request): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user instanceof Adherent) {
+        if (! $user instanceof Adherent) {
             return $this->json([
                 'success' => false,
                 'message' => 'non authentifié',
@@ -30,7 +32,7 @@ class SlotController extends AbstractController
         }
 
         $csrfToken = (string) $request->headers->get('X-CSRF-TOKEN', '');
-        if (!$this->isCsrfTokenValid('slot_reserve', $csrfToken)) {
+        if (! $this->isCsrfTokenValid('slot_reserve', $csrfToken)) {
             return $this->json([
                 'success' => false,
                 'message' => 'csrf invalide',

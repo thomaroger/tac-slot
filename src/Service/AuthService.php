@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Adherent;
@@ -17,19 +19,29 @@ use Doctrine\ORM\EntityManagerInterface;
 class AuthService
 {
     public const REQUEST_EMPTY_IDENTIFIER = 'empty_identifier';
+
     public const REQUEST_ADHERENT_NOT_FOUND = 'adherent_not_found';
+
     public const REQUEST_MISSING_EMAIL = 'missing_email';
+
     public const REQUEST_NOT_ALLOWED = 'not_allowed';
+
     public const REQUEST_RATE_LIMITED = 'rate_limited';
+
     public const REQUEST_CODE_SENT = 'code_sent';
 
     public const VERIFY_INVALID_SESSION = 'invalid_session';
+
     public const VERIFY_EMAIL_NOT_VERIFIED = 'email_not_verified';
+
     public const VERIFY_CODE_INVALID = 'code_invalid';
+
     public const VERIFY_RATE_LIMITED = 'rate_limited';
+
     public const VERIFY_SUCCESS = 'success';
 
     public const EMAIL_TOKEN_INVALID = 'token_invalid';
+
     public const EMAIL_TOKEN_VERIFIED = 'verified';
 
     public function __construct(
@@ -53,7 +65,7 @@ class AuthService
 
         $slot = $this->slotRepository->findCurrentSlotWithReservations(new DateTimeImmutable());
 
-        if (null !== $slot) {
+        if ($slot !== null) {
             foreach ($slot->getReservations() as $reservation) {
                 if ($reservation->isCheckedIn()) {
                     $slotCheckIn++;
@@ -78,7 +90,10 @@ class AuthService
     public function requestLoginCode(string $identifier, string $sessionId, ?string $ip, ?string $userAgent): array
     {
         if ($this->isCodeRequestRateLimited($ip)) {
-            return ['status' => self::REQUEST_RATE_LIMITED, 'adherentId' => null];
+            return [
+                'status' => self::REQUEST_RATE_LIMITED,
+                'adherentId' => null,
+            ];
         }
 
         $identifier = trim($identifier);
@@ -86,33 +101,48 @@ class AuthService
             $this->logEvent('CODE_REQUEST_FAILED', null, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::REQUEST_EMPTY_IDENTIFIER, 'adherentId' => null];
+            return [
+                'status' => self::REQUEST_EMPTY_IDENTIFIER,
+                'adherentId' => null,
+            ];
         }
 
         $adherent = $this->adherentRepository->findOneByEmailOrLicense($identifier);
-        if (!$adherent instanceof Adherent) {
+        if (! $adherent instanceof Adherent) {
             $this->logEvent('CODE_REQUEST_FAILED', null, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::REQUEST_ADHERENT_NOT_FOUND, 'adherentId' => null];
+            return [
+                'status' => self::REQUEST_ADHERENT_NOT_FOUND,
+                'adherentId' => null,
+            ];
         }
         if ($adherent->isDeleted()) {
             $this->logEvent('CODE_REQUEST_FAILED', null, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::REQUEST_ADHERENT_NOT_FOUND, 'adherentId' => null];
+            return [
+                'status' => self::REQUEST_ADHERENT_NOT_FOUND,
+                'adherentId' => null,
+            ];
         }
-        if (!$adherent->getEmail()) {
+        if (! $adherent->getEmail()) {
             $this->logEvent('CODE_REQUEST_FAILED', $adherent, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::REQUEST_MISSING_EMAIL, 'adherentId' => null];
+            return [
+                'status' => self::REQUEST_MISSING_EMAIL,
+                'adherentId' => null,
+            ];
         }
-        if (!$adherent->isCanOpenShoot()) {
+        if (! $adherent->isCanOpenShoot()) {
             $this->logEvent('CODE_REQUEST_FAILED', $adherent, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::REQUEST_NOT_ALLOWED, 'adherentId' => null];
+            return [
+                'status' => self::REQUEST_NOT_ALLOWED,
+                'adherentId' => null,
+            ];
         }
 
         $existingCodes = $this->authCodeRepository->findLoginCodesForSessionAndAdherent($sessionId, $adherent);
@@ -131,10 +161,10 @@ class AuthService
         $this->em->persist($authCode);
 
         if (
-            !$adherent->isEmailVerified()
+            ! $adherent->isEmailVerified()
             && (
-                !$adherent->getEmailVerificationToken()
-                || null === $adherent->getEmailVerificationTokenExpiresAt()
+                ! $adherent->getEmailVerificationToken()
+                || $adherent->getEmailVerificationTokenExpiresAt() === null
                 || $adherent->getEmailVerificationTokenExpiresAt() <= new DateTimeImmutable()
             )
         ) {
@@ -149,71 +179,100 @@ class AuthService
 
         $this->authMailer->sendLoginCode($adherent, $code);
 
-        return ['status' => self::REQUEST_CODE_SENT, 'adherentId' => $adherent->getId()];
+        return [
+            'status' => self::REQUEST_CODE_SENT,
+            'adherentId' => $adherent->getId(),
+        ];
     }
 
     /**
      * @return array{status: string, adherent: Adherent|null}
      */
-    public function verifyLoginCode(string $code, string $sessionId, mixed $adherentId, ?string $ip, ?string $userAgent): array
-    {
+    public function verifyLoginCode(
+        string $code,
+        string $sessionId,
+        mixed $adherentId,
+        ?string $ip,
+        ?string $userAgent
+    ): array {
         if ($this->isCodeVerifyRateLimited($ip)) {
-            return ['status' => self::VERIFY_RATE_LIMITED, 'adherent' => null];
+            return [
+                'status' => self::VERIFY_RATE_LIMITED,
+                'adherent' => null,
+            ];
         }
 
         $code = trim($code);
 
-        if ($code === '' || !$adherentId) {
+        if ($code === '' || ! $adherentId) {
             $this->logEvent('LOGIN_FAILED', null, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::VERIFY_INVALID_SESSION, 'adherent' => null];
+            return [
+                'status' => self::VERIFY_INVALID_SESSION,
+                'adherent' => null,
+            ];
         }
 
         $adherent = $this->adherentRepository->find((int) $adherentId);
-        if (!$adherent instanceof Adherent) {
+        if (! $adherent instanceof Adherent) {
             $this->logEvent('LOGIN_FAILED', null, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::VERIFY_CODE_INVALID, 'adherent' => null];
+            return [
+                'status' => self::VERIFY_CODE_INVALID,
+                'adherent' => null,
+            ];
         }
         if ($adherent->isDeleted()) {
             $this->logEvent('LOGIN_FAILED', null, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::VERIFY_CODE_INVALID, 'adherent' => null];
+            return [
+                'status' => self::VERIFY_CODE_INVALID,
+                'adherent' => null,
+            ];
         }
 
-        if (!$adherent->isEmailVerified()) {
+        if (! $adherent->isEmailVerified()) {
             $this->logEvent('EMAIL_NOT_VERIFIED', $adherent, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::VERIFY_EMAIL_NOT_VERIFIED, 'adherent' => null];
+            return [
+                'status' => self::VERIFY_EMAIL_NOT_VERIFIED,
+                'adherent' => null,
+            ];
         }
 
         $authCode = $this->authCodeRepository->findOneLoginCodeForSession($sessionId, $adherent, $code);
         $now = new DateTimeImmutable();
 
-        if ($authCode instanceof AuthCode && !$authCode->isUsed() && $authCode->getExpiresAt() > $now) {
+        if ($authCode instanceof AuthCode && ! $authCode->isUsed() && $authCode->getExpiresAt() > $now) {
             $authCode->setUsedAt($now);
             $this->logEvent('LOGIN_SUCCESS', $adherent, $ip, $userAgent);
             $this->em->flush();
 
-            return ['status' => self::VERIFY_SUCCESS, 'adherent' => $adherent];
+            return [
+                'status' => self::VERIFY_SUCCESS,
+                'adherent' => $adherent,
+            ];
         }
 
         $this->logEvent('LOGIN_FAILED', null, $ip, $userAgent);
         $this->em->flush();
 
-        return ['status' => self::VERIFY_CODE_INVALID, 'adherent' => null];
+        return [
+            'status' => self::VERIFY_CODE_INVALID,
+            'adherent' => null,
+        ];
     }
 
     public function verifyEmailToken(string $token, ?string $ip, ?string $userAgent): string
     {
         $adherent = $this->adherentRepository->findOneByEmailVerificationToken($token);
         if (
-            !$adherent instanceof Adherent
-            || null === $adherent->getEmailVerificationTokenExpiresAt()
+            ! $adherent instanceof Adherent
+            || $adherent->getEmailVerificationTokenExpiresAt() === null
             || $adherent->getEmailVerificationTokenExpiresAt() <= new DateTimeImmutable()
         ) {
             return self::EMAIL_TOKEN_INVALID;

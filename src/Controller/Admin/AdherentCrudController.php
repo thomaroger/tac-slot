@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Adherent;
@@ -18,13 +20,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AdherentCrudController extends AbstractCrudController
@@ -48,7 +50,10 @@ class AdherentCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Adhérent')
             ->setEntityLabelInPlural('Adhérents')
-            ->setDefaultSort(['lastName' => 'ASC', 'firstName' => 'ASC']);
+            ->setDefaultSort([
+                'lastName' => 'ASC',
+                'firstName' => 'ASC',
+            ]);
     }
 
     public function configureFields(string $pageName): iterable
@@ -119,7 +124,7 @@ class AdherentCrudController extends AbstractCrudController
     public function softDelete(Request $request): RedirectResponse
     {
         $id = $request->query->get('entityId');
-        if (!$id) {
+        if (! $id) {
             return $this->redirect($request->headers->get('referer') ?? $this->urlGenerator->generate('admin'));
         }
 
@@ -141,7 +146,7 @@ class AdherentCrudController extends AbstractCrudController
         if ($request->isMethod('POST')) {
             /** @var UploadedFile|null $file */
             $file = $request->files->get('import_file');
-            if (!$file instanceof UploadedFile) {
+            if (! $file instanceof UploadedFile) {
                 $flashBag?->add('danger', 'Aucun fichier n’a été envoyé.');
             } else {
                 $count = $this->adherentImportService->importCsvFile($file);

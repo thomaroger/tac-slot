@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Slot;
@@ -25,11 +27,11 @@ class SlotGenerationService
             $dayOfWeek = (int) $currentDate->format('N');
             $timeRange = $this->getTimeRangeForDay($dayOfWeek);
 
-            if (null !== $timeRange) {
+            if ($timeRange !== null) {
                 [$startHour, $endHour] = $timeRange;
 
-                $startTime = new \DateTimeImmutable($currentDate->format('Y-m-d').' '.$startHour);
-                $endLimit = new \DateTimeImmutable($currentDate->format('Y-m-d').' '.$endHour);
+                $startTime = new \DateTimeImmutable($currentDate->format('Y-m-d') . ' ' . $startHour);
+                $endLimit = new \DateTimeImmutable($currentDate->format('Y-m-d') . ' ' . $endHour);
 
                 while ($startTime < $endLimit) {
                     $slotEnd = $startTime->modify('+1 hour 30 minutes');
@@ -37,7 +39,7 @@ class SlotGenerationService
                         $slotEnd = $endLimit;
                     }
 
-                    if (!$this->slotRepository->existsByStartAndEnd($startTime, $slotEnd)) {
+                    if (! $this->slotRepository->existsByStartAndEnd($startTime, $slotEnd)) {
                         $slot = new Slot();
                         $slot->setStartAt($startTime)
                             ->setEndAt($slotEnd)

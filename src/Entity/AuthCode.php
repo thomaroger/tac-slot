@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use DateTimeImmutable;
@@ -107,7 +109,7 @@ class AuthCode
 
     public function isUsed(): bool
     {
-        return null !== $this->usedAt;
+        return $this->usedAt !== null;
     }
 
     public function getSessionId(): string
@@ -134,4 +136,3 @@ class AuthCode
         return $this;
     }
 }
-

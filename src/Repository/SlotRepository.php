@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Slot;
@@ -27,7 +29,7 @@ class SlotRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
 
-        return null !== $slotId;
+        return $slotId !== null;
     }
 
     /**
@@ -97,7 +99,7 @@ class SlotRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
 
-        return null !== $slotId;
+        return $slotId !== null;
     }
 
     public function countByStartAtWindow(\DateTimeImmutable $start, \DateTimeImmutable $end): int

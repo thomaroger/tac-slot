@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Adherent;
@@ -19,12 +21,12 @@ class AdherentImportService
     public function importCsvFile(UploadedFile $file): int
     {
         $path = $file->getRealPath();
-        if (!$path) {
+        if (! $path) {
             return 0;
         }
 
         $handle = fopen($path, 'r');
-        if (false === $handle) {
+        if ($handle === false) {
             return 0;
         }
 
@@ -38,7 +40,7 @@ class AdherentImportService
             }
 
             $data = array_combine($header, $row);
-            if (!is_array($data)) {
+            if (! is_array($data)) {
                 continue;
             }
 
@@ -48,7 +50,7 @@ class AdherentImportService
             }
 
             $adherent = $this->adherentRepository->findOneByLicenseNumber($licenseNumber);
-            if (!$adherent instanceof Adherent) {
+            if (! $adherent instanceof Adherent) {
                 $adherent = new Adherent();
                 $adherent->setLicenseNumber($licenseNumber);
                 $this->em->persist($adherent);
@@ -60,17 +62,17 @@ class AdherentImportService
                 ->setEmail($this->getString($data, ['email', 'Email']));
 
             $level = $this->getString($data, ['niveau', 'Niveau']);
-            if (null !== $level) {
+            if ($level !== null) {
                 $adherent->setLevel($level);
             }
 
             $airKeyRaw = $this->getString($data, ['air_key', 'Air key', 'Air Key']);
-            if (null !== $airKeyRaw) {
+            if ($airKeyRaw !== null) {
                 $adherent->setAirKey($this->toBool($airKeyRaw));
             }
 
             $role = $this->getString($data, ['role', 'Role', 'Rôle']);
-            if (null !== $role) {
+            if ($role !== null) {
                 $adherent->setRole($role);
             }
 

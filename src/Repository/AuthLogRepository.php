@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\AuthLog;
@@ -28,12 +30,14 @@ class AuthLogRepository extends ServiceEntityRepository
             ->setParameter('since', $since)
             ->setParameter('events', $events);
 
-        if (null === $ip) {
+        if ($ip === null) {
             $qb->andWhere('al.ip IS NULL');
         } else {
-            $qb->andWhere('al.ip = :ip')->setParameter('ip', $ip);
+            $qb->andWhere('al.ip = :ip')
+                ->setParameter('ip', $ip);
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()
+            ->getSingleScalarResult();
     }
 }

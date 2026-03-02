@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -21,4 +23,3 @@ class LoginEntryPoint implements AuthenticationEntryPointInterface
         return new RedirectResponse($this->urlGenerator->generate('app_login'));
     }
 }
-

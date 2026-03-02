@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -8,10 +10,12 @@ use Doctrine\ORM\Mapping as ORM;
 class Reservation
 {
     public const STATUS_CONFIRMED = 'confirmed';
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_CANCELLED = 'cancelled';
-    public const STATUS_NO_SHOW = 'no_show';
 
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    public const STATUS_NO_SHOW = 'no_show';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -60,13 +64,13 @@ class Reservation
     {
         $this->slot = $slot;
 
-        if ($slot && !$slot->getReservations()->contains($this)) {
+        if ($slot && ! $slot->getReservations()->contains($this)) {
             $slot->addReservation($this);
         }
 
         return $this;
     }
-    
+
     public function getUser(): Adherent
     {
         return $this->user;
@@ -75,9 +79,9 @@ class Reservation
     public function setUser(Adherent $user): self
     {
         $this->user = $user;
-        
+
         return $this;
-    }   
+    }
 
     public function getStatus(): string
     {
@@ -87,9 +91,9 @@ class Reservation
     public function setStatus(string $status): self
     {
         $this->status = $status;
-        
+
         return $this;
-    }   
+    }
 
     public function isCheckedIn(): bool
     {
@@ -99,9 +103,9 @@ class Reservation
     public function setCheckedIn(bool $checkedIn): self
     {
         $this->checkedIn = $checkedIn;
-        
+
         return $this;
-    }   
+    }
 
     public function getReservedAt(): \DateTimeImmutable
     {
@@ -111,9 +115,9 @@ class Reservation
     public function setReservedAt(\DateTimeImmutable $reservedAt): self
     {
         $this->reservedAt = $reservedAt;
-        
+
         return $this;
-    }   
+    }
 
     public function getCheckedInAt(): ?\DateTimeImmutable
     {
@@ -123,9 +127,9 @@ class Reservation
     public function setCheckedInAt(?\DateTimeImmutable $checkedInAt): self
     {
         $this->checkedInAt = $checkedInAt;
-        
+
         return $this;
-    }   
+    }
 
     public function getCancelledAt(): ?\DateTimeImmutable
     {
@@ -135,9 +139,9 @@ class Reservation
     public function setCancelledAt(?\DateTimeImmutable $cancelledAt): self
     {
         $this->cancelledAt = $cancelledAt;
-        
+
         return $this;
-    }   
+    }
 
     public function isCancelled(): bool
     {
@@ -149,17 +153,13 @@ class Reservation
         return $this->status === self::STATUS_NO_SHOW;
     }
 
-
     public function isReserved(): bool
     {
         return $this->status === self::STATUS_CONFIRMED;
     }
 
-
-
     public function isPreReserved(): bool
     {
         return $this->status === self::STATUS_PENDING;
     }
-    
 }

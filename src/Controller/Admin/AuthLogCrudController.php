@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\AuthLog;
@@ -22,7 +24,9 @@ class AuthLogCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInSingular('Journal d’authentification')
             ->setEntityLabelInPlural('Journaux d’authentification')
-            ->setDefaultSort(['createdAt' => 'DESC'])
+            ->setDefaultSort([
+                'createdAt' => 'DESC',
+            ])
             ->showEntityActionsInlined();
     }
 
@@ -38,4 +42,3 @@ class AuthLogCrudController extends AbstractCrudController
         ];
     }
 }
-

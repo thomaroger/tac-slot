@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Adherent;
@@ -44,4 +46,3 @@ class AuthMailer
         $this->mailer->send($email);
     }
 }
-

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Adherent;
@@ -76,7 +78,10 @@ class AuthController extends AbstractController
             }
 
             if ($result['status'] === AuthService::VERIFY_EMAIL_NOT_VERIFIED) {
-                $this->addFlash('danger', 'Votre compte n\'a pas été vérifié, vérifiez vos mails pour valider votre compte.');
+                $this->addFlash(
+                    'danger',
+                    'Votre compte n\'a pas été vérifié, vérifiez vos mails pour valider votre compte.'
+                );
 
                 return $this->redirectToRoute('app_login');
             }
