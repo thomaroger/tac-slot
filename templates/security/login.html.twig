@@ -8,22 +8,27 @@
 			</p>
 		</a>
 
-         {% if slotopened == true %}
-            <div class="alert alert-success" role="alert">
-            <h4 class="alert-heading">Salle ouverte !</h4>
-            <p><strong>{{slotCheckIn}} personne{% if slotCheckIn > 1 %}s{% endif %}</strong> présente{% if slotCheckIn > 1 %}s{% endif %} en salle sur <strong>{{slotResa}} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.</p>
-            
-           
-            
-            </div>
-        {% endif %}
-        
-        {% if slotopened == false  %}
-            <div class="alert alert-danger" role="alert">
-                <h4 class="alert-heading">Salle fermée !</h4>
-                <p>Aucun créneau n'est disponible à cette heure</p>
-            </div>
-        {% endif %}
+<section class="home-section mb-5">
+
+	{% if slotopened == true %}
+		<div class="alert alert-success" role="alert">
+			<h4 class="alert-heading">Salle ouverte !</h4>
+			<p>
+				<strong>{{slotReservations|length}} personne{% if slotReservations|length > 1 %}s{% endif %}</strong> présente{% if slotReservations|length > 1 %}s
+				{% endif %}
+				en salle sur
+				<strong>{{slotResa}} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.</p>
+		</div>
+	{% endif %}
+
+	{% if slotopened == false  %}
+		<div class="alert alert-danger" role="alert">
+			<h4 class="alert-heading">Salle fermée !</h4>
+			<p>Aucun créneau n'est disponible à cette heure</p>
+		</div>
+	{% endif %}
+</section>
+
 
 
 		<form action="{{ path('app_login') }}" method="post">

@@ -65,7 +65,8 @@ class SlotRepository extends ServiceEntityRepository
             ->andWhere('s.startAt <= :now')
             ->andWhere('s.endAt >= :now')
             ->setParameter('now', $now)
-            ->setMaxResults(1)
+            ->orderBy('s.startAt', 'DESC')
+            ->addOrderBy('s.id', 'ASC')
             ->getQuery()
             ->getOneOrNullResult();
     }

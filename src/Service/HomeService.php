@@ -64,14 +64,13 @@ class HomeService
         $slot = $this->slotRepository->findCurrentSlotWithReservations($now);
 
         $slotReservations = [];
-        $slotopened = false;
+        $slotopened = $slot !== null;
         $slotResa = 0;
 
         if ($slot !== null) {
             foreach ($slot->getReservations() as $reservation) {
                 if ($reservation->isCheckedIn()) {
                     $slotReservations[] = $reservation;
-                    $slotopened = true;
                 }
                 if ($reservation->getStatus() === Reservation::STATUS_CONFIRMED) {
                     $slotResa++;

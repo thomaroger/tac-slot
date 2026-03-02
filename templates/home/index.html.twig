@@ -28,7 +28,16 @@
         <hr>
         <p class="mb-0">
             {% for slotReservation in slotReservations %}
-                {% if not loop.first %}, {% endif %}{{slotReservation.user.getFirstname()}} {{slotReservation.user.getLastname()}} {% if slotReservation.user.hasAirKey() %}<i class="fa-solid fa-key"></i>{% endif %}
+{% if not loop.first %},
+{% endif %}
+{{slotReservation.user.getFirstname()}}
+{{slotReservation.user.getLastname()}}
+{% if slotReservation.user.hasAirKey() %}
+	<span class="status-badge badge-airkey">
+		<i class="fa-solid fa-key" aria-hidden="true"></i>
+		AirKey</span>
+{% endif %}
+
             {% endfor %}
         </p>
         </div>

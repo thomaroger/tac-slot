@@ -11,6 +11,7 @@ use App\Entity\Reservation;
 use App\Repository\AdherentRepository;
 use App\Repository\AuthCodeRepository;
 use App\Repository\AuthLogRepository;
+use App\Repository\ReservationRepository;
 use App\Repository\SlotRepository;
 use DateInterval;
 use DateTimeImmutable;
@@ -49,6 +50,7 @@ class AuthService
         private readonly AuthCodeRepository $authCodeRepository,
         private readonly AuthLogRepository $authLogRepository,
         private readonly SlotRepository $slotRepository,
+        private readonly ReservationRepository $reservationRepository,
         private readonly EntityManagerInterface $em,
         private readonly AuthMailer $authMailer,
     ) {
@@ -59,17 +61,17 @@ class AuthService
      */
     public function getCurrentSlotSummary(): array
     {
-        $slotopened = false;
-        $slotResa = 0;
-        $slotCheckIn = 0;
+        $now = new \DateTimeImmutable();
+        $slot = $this->slotRepository->findCurrentSlotWithReservations($now);
 
-        $slot = $this->slotRepository->findCurrentSlotWithReservations(new DateTimeImmutable());
+        $slotReservations = [];
+        $slotopened = $slot !== null;
+        $slotResa = 0;
 
         if ($slot !== null) {
             foreach ($slot->getReservations() as $reservation) {
                 if ($reservation->isCheckedIn()) {
-                    $slotCheckIn++;
-                    $slotopened = true;
+                    $slotReservations[] = $reservation;
                 }
                 if ($reservation->getStatus() === Reservation::STATUS_CONFIRMED) {
                     $slotResa++;
@@ -78,9 +80,10 @@ class AuthService
         }
 
         return [
+            'slot' => $slot,
             'slotopened' => $slotopened,
+            'slotReservations' => $slotReservations,
             'slotResa' => $slotResa,
-            'slotCheckIn' => $slotCheckIn,
         ];
     }
 
