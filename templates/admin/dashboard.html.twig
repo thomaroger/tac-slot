@@ -1,143 +1,656 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 {% block content_title %}{{ page_title }}{% endblock %}
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .admin-dashboard {
+            --activity-bg: #eef7ff;
+            --activity-border: #9fd0f8;
+            --activity-text: #0a4d75;
+            --reliability-bg: #eaf8ef;
+            --reliability-border: #9fd8ae;
+            --reliability-text: #155724;
+            --noshow-bg: #fdecee;
+            --noshow-border: #f1aeb5;
+            --noshow-text: #842029;
+            --adherent-bg: #fff8e8;
+            --adherent-border: #f2d18a;
+            --adherent-text: #7a4f01;
+        }
+
+        .admin-kpi-section {
+            margin-bottom: 2rem;
+        }
+
+        .admin-kpi-header {
+            margin-bottom: 1rem;
+        }
+
+        .admin-kpi-kicker {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: #6c757d;
+            margin-bottom: 0.2rem;
+        }
+
+        .admin-kpi-title {
+            margin: 0;
+            font-size: 1.55rem;
+            font-weight: 700;
+        }
+
+        .admin-theme-overview .card {
+            border: 1px solid #e8eaed;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .admin-theme-overview .card-body {
+            padding: 1rem 1.1rem;
+        }
+
+        .admin-theme-overview h2 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+            font-weight: 700;
+        }
+
+        .admin-theme-overview p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .admin-kpi-card {
+            border: 1px solid #e8eaed;
+            border-radius: 14px;
+            box-shadow: 0 8px 18px rgba(20, 20, 20, 0.04);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .admin-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(20, 20, 20, 0.07);
+        }
+
+        .admin-kpi-card .card-body {
+            padding: 1rem 1.1rem;
+        }
+
+        .admin-kpi-card h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.45rem;
+            color: #242b33;
+        }
+
+        .admin-kpi-card .display-6 {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.35rem;
+            color: #242b33;
+        }
+
+        .admin-kpi-card .text-muted {
+            color: #66707a !important;
+            font-size: 0.9rem;
+        }
+
+        .kpi-theme-activity {
+            background: linear-gradient(180deg, var(--activity-bg) 0%, #ffffff 70%);
+            border-color: var(--activity-border);
+        }
+
+        .kpi-theme-reliability {
+            background: linear-gradient(180deg, var(--reliability-bg) 0%, #ffffff 70%);
+            border-color: var(--reliability-border);
+        }
+
+        .kpi-theme-noshow {
+            background: linear-gradient(180deg, var(--noshow-bg) 0%, #ffffff 70%);
+            border-color: var(--noshow-border);
+        }
+
+        .kpi-theme-adherents {
+            background: linear-gradient(180deg, var(--adherent-bg) 0%, #ffffff 70%);
+            border-color: var(--adherent-border);
+        }
+
+        .theme-chip {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            margin-bottom: 0.5rem;
+        }
+
+        .chip-activity { background: var(--activity-bg); color: var(--activity-text); border: 1px solid var(--activity-border); }
+        .chip-reliability { background: var(--reliability-bg); color: var(--reliability-text); border: 1px solid var(--reliability-border); }
+        .chip-noshow { background: var(--noshow-bg); color: var(--noshow-text); border: 1px solid var(--noshow-border); }
+        .chip-adherents { background: var(--adherent-bg); color: var(--adherent-text); border: 1px solid var(--adherent-border); }
+
+        .occupancy-heatmap-wrapper {
+            overflow-x: auto;
+        }
+
+        .occupancy-heatmap {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        .occupancy-heatmap th,
+        .occupancy-heatmap td {
+            border: 1px solid #e9ecef;
+            padding: 0.55rem 0.5rem;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.86rem;
+            white-space: nowrap;
+        }
+
+        .occupancy-heatmap thead th {
+            background: #f6f7f8;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .occupancy-heatmap .day-col {
+            background: #f8f9fa;
+            font-weight: 600;
+            text-align: left;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+        }
+
+        .occupancy-empty { background: #f8f9fa; color: #9aa1a8; }
+        .occupancy-low { background: #fff8e8; color: #7a4f01; }
+        .occupancy-medium { background: #e7f1ff; color: #0a4d75; }
+        .occupancy-high { background: #eaf8ef; color: #155724; }
+        .occupancy-very-high { background: #d1f4de; color: #0f5132; }
+
+        .occupancy-rate {
+            display: block;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .occupancy-meta {
+            display: block;
+            font-size: 0.74rem;
+            opacity: 0.9;
+            margin-top: 0.15rem;
+        }
+
+        .delay-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .delay-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        .delay-table th,
+        .delay-table td {
+            border: 1px solid #e9ecef;
+            padding: 0.55rem 0.5rem;
+            vertical-align: middle;
+            font-size: 0.85rem;
+        }
+
+        .delay-table thead th {
+            background: #f6f7f8;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .delay-table .profile-col {
+            text-align: left;
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .delay-table .number-col {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .delay-bar {
+            height: 8px;
+            background: #eef2f5;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .delay-bar > span {
+            display: block;
+            height: 100%;
+            background: #0c63e4;
+            border-radius: 999px;
+        }
+
+        .forecast-card {
+            border-radius: 14px;
+            border: 1px solid #e8eaed;
+            padding: 0.85rem 1rem;
+        }
+
+        .forecast-card-low {
+            background: #fff8e8;
+            border-color: #f2d18a;
+            color: #7a4f01;
+        }
+
+        .forecast-card-medium {
+            background: #e7f1ff;
+            border-color: #9fd0f8;
+            color: #0a4d75;
+        }
+
+        .forecast-card-high {
+            background: #eaf8ef;
+            border-color: #9fd8ae;
+            color: #155724;
+        }
+
+        .forecast-date {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .forecast-rate {
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .forecast-meta {
+            font-size: 0.83rem;
+            opacity: 0.95;
+        }
+
+        .period-collapse-card {
+            border: 1px solid #e8eaed;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .period-collapse-toggle {
+            width: 100%;
+            border: 0;
+            background: #f8f9fa;
+            color: #1f2a35;
+            font-size: 1.12rem;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.95rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .period-collapse-toggle:hover {
+            background: #eef2f5;
+        }
+
+        .period-collapse-toggle[aria-expanded="true"] {
+            background: #e7f1ff;
+        }
+
+        .period-collapse-icon {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .period-collapse-toggle[aria-expanded="true"] .period-collapse-icon {
+            transform: rotate(180deg);
+        }
+
+        .period-collapse-body {
+            padding: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
+{% endblock %}
 {% block main %}
-    <section class="py-4">
-        <h1 class="h3 mb-3">Tableau de bord global</h1>
-        <div class="row g-3">
+    <div class="admin-dashboard">
+    <section class="py-4 admin-kpi-section">
+        <div class="admin-kpi-header">
+            <p class="admin-kpi-kicker">Vue d'ensemble</p>
+            <h1 class="admin-kpi-title">Tableau de bord global</h1>
+        </div>
+
+        <div class="row g-3 mb-3 admin-theme-overview">
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card h-100 kpi-theme-activity">
+                    <div class="card-body">
+                        <h2><i class="fa-solid fa-calendar-days me-2"></i>Créneaux</h2>
+                        <p>{{ slot_count ?? 0 }} créneaux au total</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card h-100 kpi-theme-activity">
+                    <div class="card-body">
+                        <h2><i class="fa-solid fa-wave-square me-2"></i>Activité</h2>
+                        <p>{{ reservation_count ?? 0 }} réservations au total</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card h-100 kpi-theme-adherents">
+                    <div class="card-body">
+                        <h2><i class="fa-solid fa-users me-2"></i>Adhérents</h2>
+                        <p>{{ adherents_active_count ?? 0 }} actifs / {{ adherents_count ?? 0 }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card h-100 kpi-theme-adherents">
+                    <div class="card-body">
+                        <h2><i class="fa-solid fa-user-group me-2"></i>Moyenne par adhérent</h2>
+                        <p>
+                            {% if (adherents_active_count ?? 0) > 0 %}
+                                {{ (reservation_count_confirmed / adherents_active_count)|round(2, 'floor') }} réservations confirmées / adhérent
+                            {% else %}
+                                0 réservation confirmée / adhérent
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card h-100 kpi-theme-activity">
                     <div class="card-body">
-                        <h2 class="h5 mb-2">Adhérents</h2>
-                        <p class="display-6 mb-1">
-                            {{ adherents_count ?? 0 }}
-                        </p>
-                        <p class="text-muted mb-0">
-                            Nombre de licenciés total.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h2 class="h5 mb-2">Créneaux</h2>
-                        <p class="display-6 mb-1">
-                            {{ slot_count ?? 0 }}
-                        </p>
-                        <p class="text-muted mb-0">
-                            Nombre de créneaux total.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h2 class="h5 mb-2">Réservations</h2>
-                        <p class="display-6 mb-1">
-                            {{ reservation_count ?? 0 }}
-                        </p>
-                        <p class="text-muted mb-0">
-                            Nombre de réservations total.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100 bg-success text-white">
-                    <div class="card-body">
-                        <h2 class="h5 mb-2 text-white">Nombre de réservations avec checkin</h2>
-                        <p class="display-6 mb-1">
-                            {{ reservation_count_with_checkin ?? 0 }}
-                        </p>
-                        <p class="text-white mb-0">
-                            Nombre total de réservation avec checkin à la salle.
-                        </p>
-                    </div>
-                </div>
-            </div>
-             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100 bg-success">
-                    <div class="card-body">
-                        <h2 class="h5 mb-2 text-white">Nombre de réservations confirmées</h2>
-                        <p class="display-6 mb-1 text-white">
-                            {{ reservation_count_confirmed ?? 0 }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100 bg-warning">
-                    <div class="card-body">
-                        <h2 class="h5 mb-2">Nombre de réservations annulées</h2>
-                        <p class="display-6 mb-1">
-                            {{ reservation_count_cancelled ?? 0 }}
-                        </p>
-                        <p class="text-muted mb-0">
-                            Nombre de réservations annulées par l'adhérent.
-                        </p>
+                        <h2><i class="fa-solid fa-circle-check me-2"></i>Réservations confirmées</h2>
+                        <p>{{ reservation_count_confirmed ?? 0 }} réservations confirmées</p>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100 bg-danger">
+                <div class="card h-100 kpi-theme-reliability">
                     <div class="card-body">
-                        <h2 class="h5 mb-2 text-white">Nombre de réservations non honorées</h2>
-                        <p class="display-6 mb-1 text-white">
-                            {{ reservation_count_noshow ?? 0 }}
-                        </p>
-                        <p class="text-white mb-0">
-                            Nombre de réservations confirmées sans checkin à la salle.
-                        </p>
+                        <h2><i class="fa-solid fa-location-dot me-2"></i>Check-in</h2>
+                        <p>{{ reservation_count_with_checkin ?? 0 }} réservations avec check-in</p>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card h-100 kpi-theme-reliability">
                     <div class="card-body">
-                        <h2 class="h5 mb-2">Nombre moyen de réservations confirmées par adhérent</h2>
-                        <p class="display-6 mb-1">
-                            {{ (reservation_count_confirmed/adherents_active_count)|round(2, 'floor')  }}
-                        </p>
-                        <p class="text-muted mb-0">
+                        <h2><i class="fa-solid fa-chart-line me-2"></i>Fiabilité</h2>
+                        <p>
+                            {% if ((reservation_count_noshow ?? 0) + (reservation_count_with_checkin ?? 0)) > 0 %}
+                                {{ ((reservation_count_with_checkin / (reservation_count_noshow + reservation_count_with_checkin)) * 100)|round(2, 'floor') }}% de check-in
+                            {% else %}
+                                0% de check-in
+                            {% endif %}
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+
+            <div class="col-12 col-md-6">
+                <div class="card h-100 kpi-theme-noshow">
                     <div class="card-body">
-                        <h2 class="h5 mb-2">Taux de fiabilité global</h2>
-                        <p class="display-6 mb-1">
-                            {{ ((reservation_count_with_checkin/(reservation_count_noshow+reservation_count_with_checkin))*100)|round(2, 'floor')  }}%
-                        </p>
-                        <p class="text-muted mb-0">
-                            Pourcentage du nombre de reservation checkin par rapport au nombre de réservations confirmées
-                        </p>
+                        <h2><i class="fa-solid fa-ban me-2"></i>Annulations</h2>
+                        <p>{{ reservation_count_cancelled ?? 0 }} réservations annulées</p>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+            <div class="col-12 col-md-6">
+                <div class="card h-100 kpi-theme-noshow">
                     <div class="card-body">
-                        <h2 class="h5 mb-2">Taux de No Show</h2>
-                        <p class="display-6 mb-1">
-                            {{ ((reservation_count_noshow/(reservation_count_noshow+reservation_count_with_checkin))*100)|round(2, 'floor')  }}%
-                        </p>
-                        <p class="text-muted mb-0">
-                            Pourcentage du nombre de reservation avec un no-show par rapport au nombre de réservations confirmées
+                        <h2><i class="fa-solid fa-user-xmark me-2"></i>Taux de no-show</h2>
+                        <p>
+                            {% if ((reservation_count_noshow ?? 0) + (reservation_count_with_checkin ?? 0)) > 0 %}
+                                {{ ((reservation_count_noshow / (reservation_count_noshow + reservation_count_with_checkin)) * 100)|round(2, 'floor') }}% de no-show
+                            {% else %}
+                                0% de no-show
+                            {% endif %}
                         </p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="card admin-kpi-card mb-3">
+            <div class="card-body">
+                <span class="theme-chip chip-activity">Activité</span>
+                <h2 class="h5 mb-2">Réservations par statut (J-14 à J+4)</h2>
+                <p class="text-muted mb-3">Vue fixe: 15 derniers jours + 4 prochains jours inclus, selon la date du créneau.</p>
+                <p class="text-muted mb-2"><small>Lecture: sur la partie passée, la courbe "Confirmées" correspond aux réservations effectivement check-in.</small></p>
+                <div style="height: 340px;">
+                    <canvas id="reservationStatusTrend15dChart" aria-label="Courbes des réservations par statut de J-14 à J+4" role="img"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-kpi-card mb-3">
+            <div class="card-body">
+                <span class="theme-chip chip-activity">Prévision</span>
+                <h2 class="h5 mb-2">Charge prévisionnelle des 4 prochains jours</h2>
+                <p class="text-muted mb-3">Réservées / places par jour avec code couleur: faible, moyen, fort.</p>
+                <div class="row g-3">
+                    {% for day in forecast_load_next_4_days %}
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="forecast-card forecast-card-{{ day.level }}">
+                                <div class="forecast-date">{{ day.date_label|upper }}</div>
+                                <div class="forecast-rate">{{ day.rate|round(1, 'floor') }}%</div>
+                                <div class="forecast-meta">{{ day.reserved }} / {{ day.capacity }} réservées</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-kpi-card mb-3">
+            <div class="card-body">
+                <span class="theme-chip chip-reliability">Fiabilité</span>
+                <h2 class="h5 mb-2">Taux d'occupation par jour et horaire (check-in)</h2>
+                <p class="text-muted mb-3">Depuis le {{ season_start_label }}. Calcul: check-in / capacité totale des créneaux pour chaque case.</p>
+                <div class="occupancy-heatmap-wrapper">
+                    <table class="occupancy-heatmap">
+                        <thead>
+                            <tr>
+                                <th>Jour / Heure</th>
+                                {% for hour in checkin_occupancy_by_day_hour.hours %}
+                                    <th>{{ hour }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for day in checkin_occupancy_by_day_hour.days %}
+                                <tr>
+                                    <th class="day-col">{{ day.label }}</th>
+                                    {% for hour in checkin_occupancy_by_day_hour.hours %}
+                                        {% set cell = checkin_occupancy_by_day_hour.cells[day.key][hour] %}
+                                        {% set heatClass = 'occupancy-empty' %}
+                                        {% if cell.capacity > 0 %}
+                                            {% if cell.rate >= 80 %}
+                                                {% set heatClass = 'occupancy-very-high' %}
+                                            {% elseif cell.rate >= 60 %}
+                                                {% set heatClass = 'occupancy-high' %}
+                                            {% elseif cell.rate >= 35 %}
+                                                {% set heatClass = 'occupancy-medium' %}
+                                            {% else %}
+                                                {% set heatClass = 'occupancy-low' %}
+                                            {% endif %}
+                                        {% endif %}
+                                        <td class="{{ heatClass }}">
+                                            {% if cell.capacity > 0 %}
+                                                <span class="occupancy-rate">{{ cell.rate|round(1, 'floor') }}%</span>
+                                                <span class="occupancy-meta">{{ cell.checkins }}/{{ cell.capacity }}</span>
+                                            {% else %}
+                                                <span class="occupancy-meta">-</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-kpi-card mb-3">
+            <div class="card-body">
+                <span class="theme-chip chip-activity">Habitudes de réservation</span>
+                <h2 class="h5 mb-2">Délai moyen de réservation de créneau (par profil)</h2>
+                <p class="text-muted mb-3">Depuis le {{ season_start_label }} (saison en cours). Uniquement statuts confirmées + no-show. Profils basés sur le niveau adhérent.</p>
+                <div class="delay-table-wrapper">
+                    <table class="delay-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 16%;">Profil</th>
+                                <th style="width: 10%;">Réservations</th>
+                                <th style="width: 10%;">Délai moyen</th>
+                                {% for bucket in booking_delay_by_profile.buckets %}
+                                    <th>{{ bucket }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in booking_delay_by_profile.profiles %}
+                                <tr>
+                                    <td class="profile-col">{{ row.profile }}</td>
+                                    <td class="number-col">{{ row.reservations }}</td>
+                                    <td class="number-col">{{ row.avg_days|round(1, 'floor') }} j</td>
+                                    <td>
+                                        {{ row.shares.d0|round(1, 'floor') }}% ({{ row.counts.d0 }})
+                                        <div class="delay-bar"><span style="width: {{ row.shares.d0|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                    <td>
+                                        {{ row.shares.d1|round(1, 'floor') }}% ({{ row.counts.d1 }})
+                                        <div class="delay-bar"><span style="width: {{ row.shares.d1|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                    <td>
+                                        {{ row.shares.d2|round(1, 'floor') }}% ({{ row.counts.d2 }})
+                                        <div class="delay-bar"><span style="width: {{ row.shares.d2|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                    <td>
+                                        {{ row.shares.d3|round(1, 'floor') }}% ({{ row.counts.d3 }})
+                                        <div class="delay-bar"><span style="width: {{ row.shares.d3|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                    <td>
+                                        {{ row.shares.d4|round(1, 'floor') }}% ({{ row.counts.d4 }})
+                                        <div class="delay-bar"><span style="width: {{ row.shares.d4|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Aucune donnée de réservation sur la période.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-kpi-card mb-3 kpi-theme-noshow">
+            <div class="card-body">
+                <span class="theme-chip chip-noshow">Annulations</span>
+                <h2 class="h5 mb-2">Taux d'annulation tardive (&lt;24h)</h2>
+                <p class="text-muted mb-3">
+                    Depuis le {{ season_start_label }} (créneaux passés): {{ late_cancellation_stats.late_rate|round(2, 'floor') }}%
+                    soit {{ late_cancellation_stats.late_count }} / {{ late_cancellation_stats.total }} annulations.
+                </p>
+                <div class="delay-table-wrapper">
+                    <table class="delay-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Délai avant créneau</th>
+                                <th style="width: 30%;">Volume</th>
+                                <th style="width: 30%;">Part</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in late_cancellation_stats.rows %}
+                                <tr>
+                                    <td class="profile-col">{{ row.label }}</td>
+                                    <td class="number-col">{{ row.count }}</td>
+                                    <td>
+                                        {{ row.share|round(1, 'floor') }}%
+                                        <div class="delay-bar"><span style="width: {{ row.share|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Aucune annulation sur la période.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-kpi-card mb-3 kpi-theme-noshow">
+            <div class="card-body">
+                <span class="theme-chip chip-noshow">No-show</span>
+                <h2 class="h5 mb-2">No-show par jour de semaine</h2>
+                <p class="text-muted mb-3">Depuis le {{ season_start_label }} (créneaux passés). Total no-show: {{ no_show_by_weekday.total }}</p>
+                <div class="delay-table-wrapper">
+                    <table class="delay-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">Jour</th>
+                                <th style="width: 30%;">Volume</th>
+                                <th style="width: 30%;">Part</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in no_show_by_weekday.rows %}
+                                <tr>
+                                    <td class="profile-col">{{ row.label }}</td>
+                                    <td class="number-col">{{ row.count }}</td>
+                                    <td>
+                                        {{ row.share|round(1, 'floor') }}%
+                                        <div class="delay-bar"><span style="width: {{ row.share|round(1, 'floor') }}%;"></span></div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Aucun no-show sur la période.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </section>
 
-    <section class="py-4">
-        <h1 class="h3 mb-3">KPIs Aujourd'hui</h1>
-        <div class="row g-3">
+    <section class="py-4 admin-kpi-section">
+        <div class="period-collapse-card">
+            <button class="period-collapse-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#period-today" aria-expanded="true" aria-controls="period-today">
+                <span>KPIs d'hier</span>
+                <i class="fa-solid fa-chevron-down period-collapse-icon" aria-hidden="true"></i>
+            </button>
+            <div id="period-today" class="collapse show">
+                <div class="period-collapse-body">
+                    <div class="row g-3">
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre de créneaux aujourd'hui</h2>
                         <p class="display-6 mb-1">
@@ -150,7 +663,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations</h2>
                         <p class="display-6 mb-1">
@@ -163,7 +676,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
                         <p class="display-6 mb-1">
@@ -176,7 +689,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
                         <p class="display-6 mb-1">
@@ -189,7 +702,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations en cours</h2>
                         <p class="display-6 mb-1">
@@ -202,7 +715,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre de réservations non honorées (No-Show)</h2>
                         <p class="display-6 mb-1">
@@ -215,7 +728,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérent ayant réservé un créneau</h2>
                         <p class="display-6 mb-1">
@@ -228,7 +741,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-reliability">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Taux de remplissage</h2>
                         <p class="display-6 mb-1">
@@ -240,14 +753,23 @@
                     </div>
                 </div>
             </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="py-4">
-        <h1 class="h3 mb-3">KPIs sur les 7 derniers jours</h1>
-        <div class="row g-3">
+    <section class="py-4 admin-kpi-section">
+        <div class="period-collapse-card">
+            <button class="period-collapse-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#period-7days" aria-expanded="false" aria-controls="period-7days">
+                <span>KPIs sur les 7 derniers jours</span>
+                <i class="fa-solid fa-chevron-down period-collapse-icon" aria-hidden="true"></i>
+            </button>
+            <div id="period-7days" class="collapse">
+                <div class="period-collapse-body">
+                    <div class="row g-3">
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre de créneaux sur les 7 derniers jours</h2>
                         <p class="display-6 mb-1">
@@ -260,7 +782,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations</h2>
                         <p class="display-6 mb-1">
@@ -273,7 +795,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
                         <p class="display-6 mb-1">
@@ -286,7 +808,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
                         <p class="display-6 mb-1">
@@ -299,7 +821,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre de réservations non honorées (No-Show)</h2>
                         <p class="display-6 mb-1">
@@ -312,7 +834,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-reliability">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Taux de remplissage</h2>
                         <p class="display-6 mb-1">
@@ -325,7 +847,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérent ayant réservé un créneau</h2>
                         <p class="display-6 mb-1">
@@ -338,7 +860,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">TOP 5 des créneaux</h2>
                         <p class="mb-1 text-muted text-center">
@@ -352,14 +874,23 @@
                     </div>
                 </div>
             </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="py-4">
-        <h1 class="h3 mb-3">KPIs sur les 30 derniers jours</h1>
-        <div class="row g-3">
+    <section class="py-4 admin-kpi-section">
+        <div class="period-collapse-card">
+            <button class="period-collapse-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#period-30days" aria-expanded="false" aria-controls="period-30days">
+                <span>KPIs sur les 30 derniers jours</span>
+                <i class="fa-solid fa-chevron-down period-collapse-icon" aria-hidden="true"></i>
+            </button>
+            <div id="period-30days" class="collapse">
+                <div class="period-collapse-body">
+                    <div class="row g-3">
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre de créneaux sur les 30 derniers jours</h2>
                         <p class="display-6 mb-1">
@@ -372,7 +903,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations</h2>
                         <p class="display-6 mb-1">
@@ -385,7 +916,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
                         <p class="display-6 mb-1">
@@ -398,7 +929,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
                         <p class="display-6 mb-1">
@@ -411,7 +942,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre de réservations non honorées (No-Show)</h2>
                         <p class="display-6 mb-1">
@@ -424,7 +955,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-reliability">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Taux de remplissage</h2>
                         <p class="display-6 mb-1">
@@ -437,7 +968,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérent ayant réservé un créneau</h2>
                         <p class="display-6 mb-1">
@@ -449,14 +980,126 @@
                     </div>
                 </div>
             </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section class="py-4">
-        <h1 class="h3 mb-3">KPIs Adhérents</h1>
-        <div class="row g-3">
+    <section class="py-4 admin-kpi-section">
+        <div class="period-collapse-card">
+            <button class="period-collapse-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#period-season" aria-expanded="false" aria-controls="period-season">
+                <span>KPIs depuis le début de saison ({{ season_start_label }})</span>
+                <i class="fa-solid fa-chevron-down period-collapse-icon" aria-hidden="true"></i>
+            </button>
+            <div id="period-season" class="collapse">
+                <div class="period-collapse-body">
+                    <div class="row g-3">
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de créneaux depuis le début de saison</h2>
+                        <p class="display-6 mb-1">
+                            {{ slot_count_season ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de créneaux depuis le 1er septembre
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_season ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservations depuis le début de saison
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-activity">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations confirmées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_confirmed_count_season ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservations confirmées depuis le début de saison
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre total de réservations annulées</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_cancelled_count_season ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de réservations annulées depuis le début de saison
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre de réservations non honorées (No-show)</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_noshow_count_season ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre de no-show depuis le début de saison
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-reliability">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Taux de remplissage</h2>
+                        <p class="display-6 mb-1">
+                            {{ tx_resa_season|round(2, 'floor') }} %
+                        </p>
+                        <p class="text-muted mb-0">
+                            Personnes présentes par rapport aux places disponibles depuis le début de saison
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2">Nombre d'adhérents ayant réservé un créneau</h2>
+                        <p class="display-6 mb-1">
+                            {{ reservation_count_adherent_season ?? 0 }}
+                        </p>
+                        <p class="text-muted mb-0">
+                            Nombre d'adhérents ayant réservé depuis le début de saison
+                        </p>
+                    </div>
+                </div>
+            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-4 admin-kpi-section">
+        <div class="card admin-kpi-card">
+            <div class="card-body">
+                <span class="theme-chip chip-adherents">Population</span>
+                <h2 class="h5 mb-3">KPIs adhérents</h2>
+                <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérents actifs</h2>
                         <p class="display-6 mb-1">
@@ -469,7 +1112,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérents avec le AirKey</h2>
                         <p class="display-6 mb-1">
@@ -481,7 +1124,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérents pouvant faire du tir libre</h2>
                         <p class="display-6 mb-1">
@@ -493,7 +1136,7 @@
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card admin-kpi-card h-100 kpi-theme-adherents">
                     <div class="card-body">
                         <h2 class="h5 mb-2">Nombre d'adhérents supprimés</h2>
                         <p class="display-6 mb-1">
@@ -505,38 +1148,252 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+            <div class="col-12">
+                <div class="card admin-kpi-card h-100 kpi-theme-reliability">
                     <div class="card-body">
-                        <h2 class="h5 mb-2">TOP 5 des adhérents les plus fiables</h2>
-                        <p class="mb-1 text-muted text-center">
-                            {% for adherent in top5_adherents %}
-                                {{adherent.firstName}} {{adherent.lastName}} : <strong>{{(adherent.ratio*100)|round(2, 'floor')}} %</strong> <br />
-                            {% endfor %}
-                        </p>
-                        <p class="text-muted mb-0">
-                            Ratio entre les reservations qui ont été checkin par rapport au nombre de réservations confirmées
-                        </p>
+                        <h2 class="h5 mb-2">Adhérents les plus fiables</h2>
+                        <p class="text-muted mb-2">Top {{ top_reliable_limit }} depuis le {{ season_start_label }} (créneaux passés, statuts confirmées + no-show, seuil mini {{ top_reliable_min_reservations }} réservations).</p>
+                        <div class="delay-table-wrapper">
+                            <table class="delay-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35%;">Adhérent</th>
+                                        <th style="width: 20%;">Niveau</th>
+                                        <th style="width: 15%;">Réservations</th>
+                                        <th style="width: 15%;">No-show</th>
+                                        <th style="width: 15%;">Fiabilité</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for adherent in top_reliable_adherents %}
+                                        <tr>
+                                            <td class="profile-col">{{ adherent.firstName }} {{ adherent.lastName }}</td>
+                                            <td class="number-col">{{ adherent.level ?? 'N/A' }}</td>
+                                            <td class="number-col">{{ adherent.totalReservations }}</td>
+                                            <td class="number-col">{{ adherent.noShowCount }}</td>
+                                            <td>
+                                                {{ (adherent.reliabilityRate * 100)|round(1, 'floor') }}%
+                                                <div class="delay-bar"><span style="width: {{ (adherent.reliabilityRate * 100)|round(1, 'floor') }}%;"></span></div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">Aucun adhérent disponible pour ce classement.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
+            <div class="col-12">
+                <div class="card admin-kpi-card h-100 kpi-theme-noshow">
                     <div class="card-body">
-                        <h2 class="h5 mb-2">TOP 5 des adhérents les moins fiables</h2>
-                        <p class="mb-1 text-muted text-center">
-                           {% for adherent in bad5_adherents %}
-                                {{adherent.firstName}} {{adherent.lastName}} : <strong>{{(adherent.ratio*100)|round(2, 'floor')}} %</strong> <br />
-                            {% endfor %}
-                        </p>
-                        <p class="text-muted mb-0">
-                            Ratio entre les reservations qui ont été checkin par rapport au nombre de réservations confirmées
-                        </p>
+                        <h2 class="h5 mb-2">Adhérents à risque no-show</h2>
+                        <p class="text-muted mb-2">Top 10 depuis le {{ season_start_label }}, avec seuil mini de {{ noshow_risk_min_reservations }} réservations.</p>
+                        <div class="delay-table-wrapper">
+                            <table class="delay-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35%;">Adhérent</th>
+                                        <th style="width: 20%;">Niveau</th>
+                                        <th style="width: 15%;">Réservations</th>
+                                        <th style="width: 15%;">No-show</th>
+                                        <th style="width: 15%;">Taux</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for adherent in top_noshow_risk_adherents %}
+                                        <tr>
+                                            <td class="profile-col">{{ adherent.firstName }} {{ adherent.lastName }}</td>
+                                            <td class="number-col">{{ adherent.level ?? 'N/A' }}</td>
+                                            <td class="number-col">{{ adherent.totalReservations }}</td>
+                                            <td class="number-col">{{ adherent.noShowCount }}</td>
+                                            <td>
+                                                {{ (adherent.noShowRate * 100)|round(1, 'floor') }}%
+                                                <div class="delay-bar"><span style="width: {{ (adherent.noShowRate * 100)|round(1, 'floor') }}%;"></span></div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">Aucun adhérent au-dessus du seuil.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                </div>
+            </div>
                 </div>
             </div>
         </div>
     </section>
-
+    </div>
 {% endblock %}
 
+{% block body_javascript %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            const canvas = document.getElementById('reservationStatusTrend15dChart');
+            if (!canvas || typeof Chart === 'undefined') {
+                return;
+            }
+
+            const trend = {{ reservation_status_trend_mixed|json_encode|raw }};
+
+            const datasetConfig = [
+                {
+                    key: 'confirmed',
+                    label: 'Confirmées / Check-in',
+                    borderColor: '#155724',
+                    backgroundColor: 'rgba(21, 87, 36, 0.14)'
+                },
+                {
+                    key: 'pending',
+                    label: 'En attente',
+                    borderColor: '#7a4f01',
+                    backgroundColor: 'rgba(122, 79, 1, 0.14)'
+                },
+                {
+                    key: 'cancelled',
+                    label: 'Annulées',
+                    borderColor: '#5f6770',
+                    backgroundColor: 'rgba(95, 103, 112, 0.14)'
+                },
+                {
+                    key: 'no_show',
+                    label: 'No-show',
+                    borderColor: '#842029',
+                    backgroundColor: 'rgba(132, 32, 41, 0.14)'
+                }
+            ];
+
+            const buildDatasets = (chartTrend) => datasetConfig.map((cfg) => ({
+                label: cfg.label,
+                metricKey: cfg.key,
+                data: (chartTrend.datasets && chartTrend.datasets[cfg.key]) ? chartTrend.datasets[cfg.key] : [],
+                borderColor: cfg.borderColor,
+                backgroundColor: cfg.backgroundColor,
+                tension: 0.25,
+                fill: false,
+                borderWidth: 2,
+                pointRadius: 3
+            }));
+
+            const chart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: trend.labels || [],
+                    datasets: buildDatasets(trend)
+                },
+                plugins: [{
+                    id: 'todayMarker',
+                    beforeDraw(chartInstance) {
+                        const todayIndex = Number.isInteger(trend.today_index) ? trend.today_index : 14;
+                        const xScale = chartInstance.scales.x;
+                        const chartArea = chartInstance.chartArea;
+
+                        if (!xScale || !chartArea || todayIndex < 0 || todayIndex >= chartInstance.data.labels.length) {
+                            return;
+                        }
+
+                        const x = xScale.getPixelForValue(todayIndex);
+                        const ctx = chartInstance.ctx;
+
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(12, 99, 228, 0.06)';
+                        ctx.fillRect(x, chartArea.top, chartArea.right - x, chartArea.bottom - chartArea.top);
+                        ctx.restore();
+                    },
+                    afterDraw(chartInstance) {
+                        const todayIndex = Number.isInteger(trend.today_index) ? trend.today_index : 14;
+                        const xScale = chartInstance.scales.x;
+                        const yScale = chartInstance.scales.y;
+                        const chartArea = chartInstance.chartArea;
+
+                        if (!xScale || !yScale || todayIndex < 0 || todayIndex >= chartInstance.data.labels.length) {
+                            return;
+                        }
+
+                        const x = xScale.getPixelForValue(todayIndex);
+                        const top = yScale.top;
+                        const bottom = yScale.bottom;
+                        const ctx = chartInstance.ctx;
+
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, top);
+                        ctx.lineTo(x, bottom);
+                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = '#0c63e4';
+                        ctx.setLineDash([6, 4]);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        ctx.fillStyle = '#0c63e4';
+                        ctx.font = '600 12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('Aujourd\'hui', x, top - 8);
+                        ctx.textAlign = 'right';
+                        ctx.fillStyle = 'rgba(12, 99, 228, 0.85)';
+                        ctx.fillText('Futur', chartArea.right - 6, top + 14);
+                        ctx.restore();
+                    }
+                }],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title(context) {
+                                    const index = context && context[0] ? context[0].dataIndex : -1;
+                                    if (index < 0 || !trend.full_labels || !trend.full_labels[index]) {
+                                        return '';
+                                    }
+
+                                    return trend.full_labels[index];
+                                },
+                                label(context) {
+                                    const index = context.dataIndex;
+                                    const value = context.parsed && Number.isFinite(context.parsed.y) ? context.parsed.y : 0;
+                                    const metricKey = context.dataset ? context.dataset.metricKey : '';
+                                    const todayIndex = Number.isInteger(trend.today_index) ? trend.today_index : 14;
+
+                                    if (metricKey === 'confirmed' && index < todayIndex) {
+                                        return 'Check-in: ' + value;
+                                    }
+
+                                    if (metricKey === 'confirmed') {
+                                        return 'Confirmées: ' + value;
+                                    }
+
+                                    return context.dataset.label + ': ' + value;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+{% endblock %}

@@ -286,6 +286,64 @@ class ReservationRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return Reservation[]
+     */
+    public function findWithSlotAndUserBySlotStartWindow(
+        \DateTimeImmutable $start,
+        \DateTimeImmutable $end
+    ): array {
+        return $this->createQueryBuilder('r')
+            ->select('r', 's', 'u')
+            ->join('r.slot', 's')
+            ->join('r.user', 'u')
+            ->where('s.startAt >= :start')
+            ->andWhere('s.startAt < :end')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Reservation[]
+     */
+    public function findCancelledWithSlotBySlotStartWindow(
+        \DateTimeImmutable $start,
+        \DateTimeImmutable $end
+    ): array {
+        return $this->createQueryBuilder('r')
+            ->select('r', 's')
+            ->join('r.slot', 's')
+            ->where('s.startAt >= :start')
+            ->andWhere('s.startAt < :end')
+            ->andWhere('r.status = :status')
+            ->andWhere('r.cancelledAt IS NOT NULL')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('status', Reservation::STATUS_CANCELLED)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Reservation[]
+     */
+    public function findNoShowWithSlotBySlotStartWindow(\DateTimeImmutable $start, \DateTimeImmutable $end): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r', 's')
+            ->join('r.slot', 's')
+            ->where('s.startAt >= :start')
+            ->andWhere('s.startAt < :end')
+            ->andWhere('r.status = :status')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('status', Reservation::STATUS_NO_SHOW)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     public function findAdherentsByCheckinRatio(int $limit = 5, string $order = 'DESC'): array
@@ -304,6 +362,83 @@ class ReservationRepository extends ServiceEntityRepository
             ->having('COUNT(r.id) > 0')
             ->orderBy('ratio', $safeOrder)
             ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function findAdherentsAtRiskNoShow(
+        \DateTimeImmutable $start,
+        \DateTimeImmutable $end,
+        int $minReservations = 5,
+        int $limit = 10
+    ): array {
+        $safeMinReservations = max(1, $minReservations);
+        $safeLimit = max(1, $limit);
+
+        return $this->createQueryBuilder('r')
+            ->join('r.user', 'u')
+            ->join('r.slot', 's')
+            ->select('u.id, u.firstName, u.lastName, u.level')
+            ->addSelect('COUNT(r.id) AS totalReservations')
+            ->addSelect('SUM(CASE WHEN r.status = :noShowStatus THEN 1 ELSE 0 END) AS noShowCount')
+            ->addSelect(
+                '(SUM(CASE WHEN r.status = :noShowStatus THEN 1 ELSE 0 END) * 1.0 / COUNT(r.id)) AS noShowRate'
+            )
+            ->where('s.startAt >= :start')
+            ->andWhere('s.startAt < :end')
+            ->andWhere('r.status IN (:statuses)')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('noShowStatus', Reservation::STATUS_NO_SHOW)
+            ->setParameter('statuses', [Reservation::STATUS_CONFIRMED, Reservation::STATUS_NO_SHOW])
+            ->groupBy('u.id')
+            ->having('COUNT(r.id) >= :minReservations')
+            ->setParameter('minReservations', $safeMinReservations)
+            ->orderBy('noShowRate', 'DESC')
+            ->addOrderBy('noShowCount', 'DESC')
+            ->addOrderBy('totalReservations', 'DESC')
+            ->setMaxResults($safeLimit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function findReliableAdherentsInWindow(
+        \DateTimeImmutable $start,
+        \DateTimeImmutable $end,
+        int $minReservations = 5,
+        int $limit = 10
+    ): array {
+        $safeMinReservations = max(1, $minReservations);
+        $safeLimit = max(1, $limit);
+
+        return $this->createQueryBuilder('r')
+            ->join('r.user', 'u')
+            ->join('r.slot', 's')
+            ->select('u.id, u.firstName, u.lastName, u.level')
+            ->addSelect('COUNT(r.id) AS totalReservations')
+            ->addSelect('SUM(CASE WHEN r.status = :noShowStatus THEN 1 ELSE 0 END) AS noShowCount')
+            ->addSelect('SUM(CASE WHEN r.checkedIn = true THEN 1 ELSE 0 END) AS checkinCount')
+            ->addSelect('(SUM(CASE WHEN r.checkedIn = true THEN 1 ELSE 0 END) * 1.0 / COUNT(r.id)) AS reliabilityRate')
+            ->where('s.startAt >= :start')
+            ->andWhere('s.startAt < :end')
+            ->andWhere('r.status IN (:statuses)')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('noShowStatus', Reservation::STATUS_NO_SHOW)
+            ->setParameter('statuses', [Reservation::STATUS_CONFIRMED, Reservation::STATUS_NO_SHOW])
+            ->groupBy('u.id')
+            ->having('COUNT(r.id) >= :minReservations')
+            ->setParameter('minReservations', $safeMinReservations)
+            ->orderBy('reliabilityRate', 'DESC')
+            ->addOrderBy('checkinCount', 'DESC')
+            ->addOrderBy('totalReservations', 'DESC')
+            ->setMaxResults($safeLimit)
             ->getQuery()
             ->getResult();
     }
