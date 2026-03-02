@@ -1,7 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 home-page">
+
+    <section class="home-section mb-5">
+        <div class="home-section-header">
+            <p class="home-section-kicker mb-1">Temps réel</p>
+            <h2 class="home-section-title mb-0">État de la salle</h2>
+        </div>
 
     {% if slotnow %}
     <div class="alert alert-warning" role="alert">
@@ -34,8 +40,14 @@
             <p>Aucun créneau n'est disponible à cette heure</p>
         </div>
     {% endif %}
+    </section>
 
-    <h2 class="mb-4 fw-bold">Réservation des créneaux</h2>
+    <section class="home-section">
+        <div class="home-section-header">
+            <p class="home-section-kicker mb-1">Planning</p>
+            <h2 class="home-section-title mb-0">Réservation des créneaux</h2>
+            <p class="home-section-subtitle mb-0">Choisissez un jour puis un créneau disponible.</p>
+        </div>
 
     <!-- Accordion horizontal -->
     <div class="accordion" id="weekAccordion">
@@ -56,58 +68,66 @@
                     <div class="accordion-body">
                         {% for slot in slots %}
                             {% set remaining = slot.maxPlaces - slot.reservedPlaces %}
-                            {% set cardClass = 'card slot-card mb-3 p-3 rounded-3' %}
-                            {% if slot.isReservedBy(app.user) %}{% set cardClass = cardClass ~ ' reserved bg-success text-white' %}{% endif %}
-                            {% if slot.isReservedBy(app.user, 'pending') %}{% set cardClass = cardClass ~ ' reserved bg-warning' %}{% endif %}
-                            {% if slot.isClosed %}{% set cardClass = cardClass ~ ' bg-danger text-white' %}{% endif %}
-                            {% if remaining <= 0 and not slot.reservations %}{% set cardClass = cardClass ~ ' full bg-light' %}{% endif %}
+                            {% set slotState = 'normal' %}
+                            {% if slot.isClosed %}
+                                {% set slotState = 'closed' %}
+                            {% elseif slot.isReservedBy(app.user, 'pending') %}
+                                {% set slotState = 'pending' %}
+                            {% elseif slot.isReservedBy(app.user) %}
+                                {% set slotState = 'reserved' %}
+                            {% elseif remaining <= 0 %}
+                                {% set slotState = 'full' %}
+                            {% endif %}
 
-                            <div class="{{ cardClass }}" id='slot-{{slot.id}}'>
+                            <div class="card slot-card slot-state-{{ slotState }} mb-2 mb-md-3 p-2 p-md-3 rounded-3" id='slot-{{slot.id}}'>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <strong>{{ slot.startAt|date('H:i') }} - {{ slot.endAt|date('H:i') }}</strong><br>
                                        {% if slot.isReservedBy(app.user) %}
-                                            {{ remaining }} / {{ slot.maxPlaces }} places  
+                                            <div>{{ remaining }} / {{ slot.maxPlaces }} places</div>
+                                            <div class="status-badges mt-1">
                                                 {% if slot.hasReservationWithAirKey %}
-                                                    - <i class="fa-solid fa-key">&nbsp;</i>AirKey Disponible
-                                                {% endif %} 
-                                                - Réservé <i class="fa-solid fa-check"></i>
+                                                    <span class="status-badge badge-airkey"><i class="fa-solid fa-key"></i> AirKey</span>
+                                                {% endif %}
+                                                <span class="status-badge badge-reserved"><i class="fa-solid fa-check"></i> Réservé</span>
                                                 {% if slot.isReservedByWithCheckIn(app.user) %}
-                                                    - Checkin <i class="fa-solid fa-map-pin"></i>
-                                                {% endif %} 
-                                                 
+                                                    <span class="status-badge badge-checkin"><i class="fa-solid fa-map-pin"></i> Check-in</span>
+                                                {% endif %}
+                                            </div>
                                         {% elseif remaining <= 0 %}
-                                            Complet <i class="fa-solid fa-people-pulling"></i>
+                                            <span class="status-badge badge-full"><i class="fa-solid fa-people-pulling"></i> Complet</span>
                                         {% else %}
                                             {% if not slot.isClosed %}
-                                                {{ remaining }} / {{ slot.maxPlaces }} places  
+                                                {{ remaining }} / {{ slot.maxPlaces }} places
                                                 {% if slot.hasReservationWithAirKey %}
-                                                    - <span class="text-success"><i class="fa-solid fa-key">&nbsp;</i>AirKey Disponible</span>
+                                                    <div class="status-badges mt-1">
+                                                        <span class="status-badge badge-airkey"><i class="fa-solid fa-key"></i> AirKey disponible</span>
+                                                    </div>
                                                 {% endif %}
                                             {% else %}
-                                                Fermé <i class="fa-solid fa-lock"></i>
+                                                <span class="status-badge badge-closed"><i class="fa-solid fa-lock"></i> Fermé</span>
                                             {% endif %}
                                         {% endif %}
                                     </div>
                                     <div>
                                         {% if slot.isReservedBy(app.user)  %}
                                             {% if slot.canBeCancelled %}
-                                            <button class="btn btn-danger btn-sm cancelledReservation" 
+                                            <button class="btn btn-outline-danger btn-sm cancelledReservation" 
                                                     data-slot-id="{{ slot.id }}" 
                                                     data-action="cancel">Annuler</button>
                                             {% else %}
-                                                <button class="btn btn-danger btn-sm" disabled>Annuler</button>
+                                                <button class="btn btn-outline-secondary btn-sm" disabled>Annuler</button>
                                             {% endif %}
                                         {% else %}
                                             {%if slot.isClosed %}
-                                                <button class="btn btn-sm" disabled>Fermé</button>
+                                                <button class="btn btn-outline-secondary btn-sm" disabled>Fermé</button>
                                             {% else %}
                                             {% if remaining > 0 %}
                                                 {% if not user.hasAirKey and not slot.hasReservationWithAirKey %}
                                                     <button class="btn btn-secondary btn-sm" disabled>AirKey nécessaire</button>
                                                 {% else %}
                                                     {% if slot.isReservedBy(app.user, 'pending') %}
-                                                        <button class="btn btn-danger btn-sm confirmReservationSincePending" data-slot-id="{{slot.id}}">A confirmer</button>
+                                                        <button class="btn btn-sm btn-pending-confirm confirmReservationSincePending" data-slot-id="{{slot.id}}">A confirmer</button>
                                                     {% else %}
                                                     <button class="btn btn-success btn-sm" 
                                                             data-slot-id="{{ slot.id }}" 
@@ -120,7 +140,7 @@
                                                     {% endif %}
                                                 {% endif %}
                                             {% elseif remaining == 0 %}
-                                                <button class="btn btn-secondary btn-sm" disabled>Complet</button>
+                                                <button class="btn btn-outline-secondary btn-sm" disabled>Complet</button>
                                             {% endif %}
                                             {% endif %}
                                         {% endif %}
@@ -133,6 +153,7 @@
             </div>
         {% endfor %}
     </div>
+    </section>
 </div>
 
 <!-- Modal Réservation -->

@@ -81,24 +81,32 @@
             <h5 class="card-title">Réservations du {{ start_of_day|fr_date('l d F') }}</h5>
             <hr />
              {% for reservation in current_reservations %}
-                {% set cardClass = '' %}
-                    {% if reservation.status == 'confirmed' %} 
-                        {% set cardClass = 'bg-success text-white' %}
+                {% set reservationState = 'normal' %}
+                    {% if reservation.status == 'confirmed' %}
+                        {% set reservationState = 'reserved' %}
                     {% elseif reservation.status == 'cancelled' %}
-                        {% set cardClass = 'bg-warning' %}
+                        {% set reservationState = 'pending' %}
                     {% elseif reservation.status == 'no_show' %}
-                        {% set cardClass = 'bg-danger' %}
+                        {% set reservationState = 'closed' %}
                     {% endif %}
-                    <div class="card {{ cardClass }} mt-2" id=''>
+                    <div class="card slot-card slot-state-{{ reservationState }} mt-2" id=''>
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 {{ reservation.slot.startAt|fr_date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
                             </div>
                             <div>
-                                <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
+                                {% if reservation.status == 'confirmed' %}
+                                    <span class="status-badge badge-reserved">Réservé</span>
+                                {% elseif reservation.status == 'cancelled' %}
+                                    <span class="status-badge badge-pending">Annulé</span>
+                                {% elseif reservation.status == 'no_show' %}
+                                    <span class="status-badge badge-noshow">No-show</span>
+                                {% else %}
+                                    <span class="status-badge badge-neutral">{{ reservation.status|capitalize }}</span>
+                                {% endif %}
                                 {% if reservation.isCheckedIn == true %}
-                                    <span class="badge text-bg-danger">Checkin</span>
+                                    <span class="status-badge badge-checkin">Check-in</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -113,22 +121,30 @@
             <h5 class="card-title">Réservations futures</h5>
             <hr />
          {% for reservation in futur_reservations %}
-                {% set cardClass = '' %}
-                    {% if reservation.status == 'confirmed' %} 
-                        {% set cardClass = 'bg-success text-white' %}
+                {% set reservationState = 'normal' %}
+                    {% if reservation.status == 'confirmed' %}
+                        {% set reservationState = 'reserved' %}
                     {% elseif reservation.status == 'cancelled' %}
-                        {% set cardClass = 'bg-warning' %}
+                        {% set reservationState = 'pending' %}
                     {% elseif reservation.status == 'no_show' %}
-                        {% set cardClass = 'bg-danger' %}
+                        {% set reservationState = 'closed' %}
                     {% endif %}
-                    <div class="card {{ cardClass }} mt-2" id=''>
+                    <div class="card slot-card slot-state-{{ reservationState }} mt-2" id=''>
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 {{ reservation.slot.startAt|fr_date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
                             </div>
                             <div>
-                                <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
+                                {% if reservation.status == 'confirmed' %}
+                                    <span class="status-badge badge-reserved">Réservé</span>
+                                {% elseif reservation.status == 'cancelled' %}
+                                    <span class="status-badge badge-pending">Annulé</span>
+                                {% elseif reservation.status == 'no_show' %}
+                                    <span class="status-badge badge-noshow">No-show</span>
+                                {% else %}
+                                    <span class="status-badge badge-neutral">{{ reservation.status|capitalize }}</span>
+                                {% endif %}
                             </div>
                         </div>
                         </div>
@@ -143,24 +159,32 @@
             <h5 class="card-title">Réservations passées</h5>
             <hr />
             {% for reservation in past_reservations %}
-                {% set cardClass = '' %}
-                    {% if reservation.status == 'confirmed' %} 
-                        {% set cardClass = 'bg-success text-white' %}
+                {% set reservationState = 'normal' %}
+                    {% if reservation.status == 'confirmed' %}
+                        {% set reservationState = 'reserved' %}
                     {% elseif reservation.status == 'cancelled' %}
-                        {% set cardClass = 'bg-warning' %}
+                        {% set reservationState = 'pending' %}
                     {% elseif reservation.status == 'no_show' %}
-                        {% set cardClass = 'bg-danger' %}
+                        {% set reservationState = 'closed' %}
                     {% endif %}
-                    <div class="card {{ cardClass }} mt-2" id=''>
+                    <div class="card slot-card slot-state-{{ reservationState }} mt-2" id=''>
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 {{ reservation.slot.startAt|fr_date('l d F') }} : <strong>{{ reservation.slot.startAt|date('H:i') }} - {{ reservation.slot.endAt|date('H:i') }}</strong><br>
                             </div>
                             <div>
-                                <span class="badge text-bg-secondary">{{ reservation.status|capitalize }}</span>
+                                {% if reservation.status == 'confirmed' %}
+                                    <span class="status-badge badge-reserved">Réservé</span>
+                                {% elseif reservation.status == 'cancelled' %}
+                                    <span class="status-badge badge-pending">Annulé</span>
+                                {% elseif reservation.status == 'no_show' %}
+                                    <span class="status-badge badge-noshow">No-show</span>
+                                {% else %}
+                                    <span class="status-badge badge-neutral">{{ reservation.status|capitalize }}</span>
+                                {% endif %}
                                 {% if reservation.isCheckedIn == true %}
-                                    <span class="badge text-bg-secondary">Checkin</span>
+                                    <span class="status-badge badge-checkin">Check-in</span>
                                 {% endif %}
                             </div>
                         </div>

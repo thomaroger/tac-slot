@@ -2,29 +2,161 @@
     background-color: rgb(230, 49, 46)
 }
 
-
-.slot .slot-card {
-    border-radius: 12px;
-    transition: 0.2s ease-in-out;
+.home-page .home-section {
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 14px;
+    padding: 0.9rem;
 }
 
-.slot .slot-card:hover {
+.home-page .home-section-header {
+    margin-bottom: 1.15rem;
+}
+
+.home-page .home-section-kicker {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6c757d;
+    font-weight: 700;
+}
+
+.home-page .home-section-title {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #212529;
+}
+
+.home-page .home-section-subtitle {
+    margin-top: 0.35rem;
+    color: #6c757d;
+    font-size: 0.92rem;
+}
+
+.home-page .alert:last-child {
+    margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+    .home-page .home-section {
+        padding: 1.25rem 1.35rem;
+    }
+
+    .home-page .home-section-header {
+        margin-bottom: 1.4rem;
+    }
+}
+
+.slot-card {
+    border-radius: 12px;
+    transition: 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+    background-color: #ffffff;
+    color: #212529;
+}
+
+.slot-card:hover {
     transform: translateY(-2px);
 }
 
-.slot .reserved {
-    background-color: #4CAF50;
-    color: white;
+.slot-state-normal {
+    border-color: #e9ecef;
+    background-color: #ffffff;
+    color: #212529;
 }
 
-.slot .full {
-    background-color: #e9ecef;
-    color: #6c757d;
+.slot-state-reserved {
+    border-color: #9fd8ae;
+    background-color: #eaf8ef;
+    color: #155724;
 }
 
-.slot .locked {
-    background-color: #f8f9fa;
-    color: #adb5bd;
+.slot-state-pending {
+    border-color: #f2d18a;
+    background-color: #fff8e8;
+    color: #7a4f01;
+}
+
+.slot-state-closed {
+    border-color: #f1aeb5;
+    background-color: #fdecee;
+    color: #842029;
+}
+
+.slot-state-full {
+    border-color: #d5d9de;
+    background-color: #f6f7f8;
+    color: #5f6770;
+}
+
+.status-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    border: 1px solid transparent;
+}
+
+.badge-airkey {
+    background: #e9f7ff;
+    border-color: #8ed0f8;
+    color: #0a4d75;
+}
+
+.badge-reserved {
+    background: #eaf8ef;
+    border-color: #9fd8ae;
+    color: #155724;
+}
+
+.badge-checkin {
+    background: #f3efff;
+    border-color: #cfc1ff;
+    color: #4a347f;
+}
+
+.badge-noshow {
+    background: #fdecee;
+    border-color: #f1aeb5;
+    color: #842029;
+}
+
+.badge-pending {
+    background: #fff8e8;
+    border-color: #f2d18a;
+    color: #7a4f01;
+}
+
+.badge-full,
+.badge-neutral,
+.badge-closed {
+    background: #f6f7f8;
+    border-color: #d5d9de;
+    color: #5f6770;
+}
+
+.btn-pending-confirm {
+    background-color: #fff7e8;
+    border: 1px solid #f0ad4e;
+    color: #8a5a00;
+}
+
+.btn-pending-confirm:hover,
+.btn-pending-confirm:focus {
+    background-color: #ffe7be;
+    border-color: #e19b30;
+    color: #6c4700;
 }
 
 .slot .timer {
