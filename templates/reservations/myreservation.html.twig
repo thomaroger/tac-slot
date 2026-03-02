@@ -1,69 +1,69 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<section class="py-4">
+<section class="py-4 kpi-section">
 <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-4">
-        <div class="card shadow-sm border-0 h-100 bg-success text-white">
+        <div class="card shadow-sm border-0 h-100 kpi-state-reserved">
             <div class="card-body">
-                <h2 class="h5 mb-2 text-white">Nombre de réservations avec checkin</h2>
-                <p class="display-6 mb-1">
+                <h2 class="kpi-card-title mb-2">Nombre de réservations avec checkin</h2>
+                <p class="kpi-card-value mb-1">
                     {{reservation_count_with_checkin}}
                 </p>
             </div>
         </div>
     </div>
         <div class="col-12 col-md-6 col-lg-4">
-        <div class="card shadow-sm border-0 h-100">
+        <div class="card shadow-sm border-0 h-100 kpi-state-reserved">
             <div class="card-body">
-                <h2 class="h5 mb-2">Nombre de réservations confirmées</h2>
-                <p class="display-6 mb-1">
+                <h2 class="kpi-card-title mb-2">Nombre de réservations confirmées</h2>
+                <p class="kpi-card-value mb-1">
                     {{reservation_count_confirmed}}
                 </p>
             </div>
         </div>
     </div>
         <div class="col-12 col-md-6 col-lg-4">
-        <div class="card shadow-sm border-0 h-100 bg-warning">
+        <div class="card shadow-sm border-0 h-100 kpi-state-pending">
             <div class="card-body">
-                <h2 class="h5 mb-2">Nombre de réservations annulées</h2>
-                <p class="display-6 mb-1">
+                <h2 class="kpi-card-title mb-2">Nombre de réservations annulées</h2>
+                <p class="kpi-card-value mb-1">
                     {{reservation_count_cancelled}}
                 </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
-        <div class="card shadow-sm border-0 h-100 bg-danger">
+        <div class="card shadow-sm border-0 h-100 kpi-state-closed">
             <div class="card-body">
-                <h2 class="h5 mb-2 text-white">Nombre de réservations non honorées</h2>
-                <p class="display-6 mb-1 text-white">
+                <h2 class="kpi-card-title mb-2">Nombre de réservations non honorées</h2>
+                <p class="kpi-card-value mb-1">
                     {{reservation_count_noshow}}
                 </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100 bg-success">
+                <div class="card shadow-sm border-0 h-100 kpi-state-reserved">
                     <div class="card-body">
-                        <h2 class="h5 mb-2 text-white">Taux de fiabilité global</h2>
-                        <p class="display-6 mb-1 text-white">
+                        <h2 class="kpi-card-title mb-2">Taux de fiabilité global</h2>
+                        <p class="kpi-card-value mb-1">
                             {{((reservation_count_with_checkin /(reservation_count_noshow + reservation_count_with_checkin))*100)|round(2, 'floor')}}%                    
                         </p>
-                        <p class="text-white mb-0">
+                        <p class="kpi-card-caption mb-0">
                             Pourcentage du nombre de reservation checkin par rapport au nombre de réservations confirmées
                         </p>
                     </div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0 h-100 bg-danger">
+                <div class="card shadow-sm border-0 h-100 kpi-state-closed">
                     <div class="card-body">
-                        <h2 class="h5 mb-2 text-white">Taux de No Show</h2>
-                        <p class="display-6 mb-1 text-white">
+                        <h2 class="kpi-card-title mb-2">Taux de No Show</h2>
+                        <p class="kpi-card-value mb-1">
                             {{((reservation_count_noshow /(reservation_count_noshow + reservation_count_with_checkin))*100)|round(2, 'floor')}}%  
                         </p>
-                        <p class="text-white mb-0">
+                        <p class="kpi-card-caption mb-0">
                             Pourcentage du nombre de reservation avec un no-show par rapport au nombre de réservations confirmées
                         </p>
                     </div>

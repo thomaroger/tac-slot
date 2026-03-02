@@ -75,7 +75,7 @@ class ReservationController extends AbstractController
         }
 
         return $this->render(
-            'reservations/myreservartion.html.twig',
+            'reservations/myreservation.html.twig',
             $this->reservationService->getMyReservationsData($user)
         );
     }
