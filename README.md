@@ -45,7 +45,7 @@ Un espace d’administration permet de piloter les adhérents, les créneaux, le
 1. Clonez le projet :
    ```bash
    git clone https://github.com/thomaroger/tac-slot
-   cd notes
+   cd tac-slot
    ```
 
 2. Copiez le fichier d’environnement :
