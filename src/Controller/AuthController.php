@@ -40,18 +40,18 @@ class AuthController extends AbstractController
 
             if ($result['status'] === AuthService::REQUEST_CODE_SENT) {
                 $session->set('auth_login_adherent_id', $result['adherentId']);
-                $this->addFlash('success', 'Un code de connexion vous a été envoyé par email.');
+                $this->addFlash('success', 'Code envoyé. Vérifiez votre email.');
 
                 return $this->redirectToRoute('app_login_code');
             }
 
             $this->addFlash('danger', match ($result['status']) {
-                AuthService::REQUEST_EMPTY_IDENTIFIER => 'Merci de renseigner votre email ou numéro de licence.',
+                AuthService::REQUEST_EMPTY_IDENTIFIER => 'Saisissez votre email ou numéro de licence.',
                 AuthService::REQUEST_ADHERENT_NOT_FOUND,
                 AuthService::REQUEST_MISSING_EMAIL,
-                AuthService::REQUEST_NOT_ALLOWED => 'Si ce compte est éligible, un code de connexion a été envoyé.',
-                AuthService::REQUEST_RATE_LIMITED => 'Trop de demandes. Merci de réessayer dans quelques minutes.',
-                default => 'Erreur lors de la demande de code.',
+                AuthService::REQUEST_NOT_ALLOWED => 'Si le compte est éligible, un code a été envoyé.',
+                AuthService::REQUEST_RATE_LIMITED => 'Trop de demandes. Réessayez dans quelques minutes.',
+                default => 'Impossible d\'envoyer le code. Réessayez.',
             });
         }
 
@@ -78,18 +78,15 @@ class AuthController extends AbstractController
             }
 
             if ($result['status'] === AuthService::VERIFY_EMAIL_NOT_VERIFIED) {
-                $this->addFlash(
-                    'danger',
-                    'Votre compte n\'a pas été vérifié, vérifiez vos mails pour valider votre compte.'
-                );
+                $this->addFlash('danger', 'Compte non vérifié. Ouvrez l\'email de validation puis réessayez.');
 
                 return $this->redirectToRoute('app_login');
             }
 
             $this->addFlash('danger', match ($result['status']) {
-                AuthService::VERIFY_INVALID_SESSION => 'Code ou session invalide.',
-                AuthService::VERIFY_RATE_LIMITED => 'Trop de tentatives. Merci de réessayer dans quelques minutes.',
-                default => 'Code invalide ou expiré.',
+                AuthService::VERIFY_INVALID_SESSION => 'Session expirée. Redemandez un code.',
+                AuthService::VERIFY_RATE_LIMITED => 'Trop de tentatives. Réessayez dans quelques minutes.',
+                default => 'Code invalide ou expiré. Demandez un nouveau code.',
             });
         }
 
@@ -112,12 +109,12 @@ class AuthController extends AbstractController
         );
 
         if ($status === AuthService::EMAIL_TOKEN_INVALID) {
-            $this->addFlash('danger', 'Lien de validation invalide ou expiré.');
+            $this->addFlash('danger', 'Lien invalide ou expiré. Redemandez un email de validation.');
 
             return $this->redirectToRoute('app_login');
         }
 
-        $this->addFlash('success', 'Votre compte est maintenant validé.');
+        $this->addFlash('success', 'Compte validé. Vous pouvez vous connecter.');
 
         return $this->redirectToRoute('app_login');
     }

@@ -28,17 +28,31 @@ document.addEventListener('DOMContentLoaded', function () {
 function showMessage(message, type = 'info') {
   const toastContainer = document.querySelector('.toast-container');
   if (toastContainer) {
+    const toneMap = { error: 'danger', message: 'info' };
+    const tone = toneMap[type] || type;
+    const delayMap = { success: 3000, warning: 4500, danger: 7000, info: 4000 };
+    const iconMap = {
+      success: 'fa-circle-check',
+      warning: 'fa-triangle-exclamation',
+      danger: 'fa-circle-xmark',
+      info: 'fa-circle-info'
+    };
+    const delay = delayMap[tone] || 4000;
+    const icon = iconMap[tone] || iconMap.info;
+
     const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-bg-${type} border-0`;
+    toast.className = `toast align-items-start border-0 app-toast app-toast-tone-${tone}`;
     toast.setAttribute('role', 'status');
     toast.setAttribute('aria-live', 'polite');
     toast.setAttribute('aria-atomic', 'true');
-    toast.setAttribute('data-bs-delay', '4000');
+    toast.setAttribute('data-bs-delay', String(delay));
     
     toast.innerHTML = `
       <div class="d-flex">
-        <div class="toast-body">${message}</div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        <div class="toast-body">
+          <i class="fa-solid ${icon} me-2" aria-hidden="true"></i>${message}
+        </div>
+        <button type="button" class="btn-close me-2 m-2" data-bs-dismiss="toast" aria-label="Fermer"></button>
       </div>
     `;
     

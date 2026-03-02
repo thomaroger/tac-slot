@@ -333,6 +333,57 @@ small,
     color: inherit;
 }
 
+.reservation-collapse-toggle {
+    font-size: var(--type-h3);
+    line-height: var(--type-heading-line-height);
+    font-weight: var(--type-emphasis-weight);
+    padding: 0.9rem 1rem;
+    border: 0;
+    background: #f8f9fa;
+    color: #212529;
+    text-align: left;
+    box-shadow: none;
+}
+
+.reservation-section-card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.reservation-section-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.reservation-collapse-toggle:hover {
+    background: #eef2f5;
+}
+
+.reservation-collapse-toggle:active,
+.reservation-collapse-toggle:focus,
+.reservation-collapse-toggle[aria-expanded="true"] {
+    background: #e7f1ff;
+    color: #212529;
+    box-shadow: none;
+}
+
+.reservation-collapse-toggle .reservation-toggle-icon {
+    transition: transform 0.2s ease-in-out;
+}
+
+.reservation-collapse-toggle[aria-expanded="true"] .reservation-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.reservation-collapse-toggle.collapsed .reservation-toggle-icon {
+    transform: rotate(0deg);
+}
+
+.reservation-section-card .card-body {
+    padding: 1rem;
+}
+
 .btn:focus-visible,
 a:focus-visible,
 .accordion-button:focus-visible,
@@ -351,4 +402,49 @@ a:focus-visible,
     font-size: var(--type-h3);
     line-height: var(--type-heading-line-height);
     font-weight: 600;
+}
+
+.app-toast-container {
+    width: min(92vw, 380px);
+}
+
+.app-toast {
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #d5d9de !important;
+    background: #f6f7f8;
+    color: #5f6770;
+}
+
+.app-toast .toast-body {
+    font-size: var(--type-body);
+    line-height: 1.35;
+}
+
+.app-toast-tone-success {
+    border-color: #9fd8ae !important;
+    background: #eaf8ef;
+    color: #155724;
+}
+
+.app-toast-tone-warning {
+    border-color: #f2d18a !important;
+    background: #fff8e8;
+    color: #7a4f01;
+}
+
+.app-toast-tone-danger {
+    border-color: #f1aeb5 !important;
+    background: #fdecee;
+    color: #842029;
+}
+
+.app-toast-tone-info,
+.app-toast-tone-primary,
+.app-toast-tone-secondary,
+.app-toast-tone-dark,
+.app-toast-tone-light {
+    border-color: #d5d9de !important;
+    background: #f6f7f8;
+    color: #5f6770;
 }

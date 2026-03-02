@@ -29,7 +29,7 @@ class SlotReservationService
                 'success' => false,
                 'message' => 'creneau fermé',
                 'flashType' => 'danger',
-                'flashMessage' => 'Vous ne pouvez pas réserver un créneau qui est fermé',
+                'flashMessage' => 'Réservation impossible: créneau fermé.',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -39,7 +39,7 @@ class SlotReservationService
                 'success' => false,
                 'message' => 'creneau plein',
                 'flashType' => 'danger',
-                'flashMessage' => 'Vous ne pouvez pas réserver un créneau qui est complet',
+                'flashMessage' => 'Réservation impossible: créneau complet. Choisissez un autre horaire.',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -50,7 +50,7 @@ class SlotReservationService
                     'success' => false,
                     'message' => 'creneau déjà pré-réservé',
                     'flashType' => 'danger',
-                    'flashMessage' => 'Vous ne pouvez pas réserver un créneau que vous avez déjà reservé',
+                    'flashMessage' => 'Ce créneau est déjà pré-réservé pour vous. Confirmez ou annulez.',
                     'remainingPlaces' => $slot->getRemainingPlaces(),
                 ];
             }
@@ -74,7 +74,7 @@ class SlotReservationService
                     'l d F'
                 ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' a été pré-réservé',
+                ) . ' est pré-réservé. Confirmez dans la minute !',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -86,7 +86,7 @@ class SlotReservationService
                     'success' => false,
                     'message' => 'reservation introuvable',
                     'flashType' => 'danger',
-                    'flashMessage' => 'Impossible de confirmer cette réservation.',
+                    'flashMessage' => 'Confirmation impossible. Recommencez la réservation.',
                     'remainingPlaces' => $slot->getRemainingPlaces(),
                 ];
             }
@@ -104,7 +104,7 @@ class SlotReservationService
                     'l d F'
                 ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' a été réservé',
+                ) . ' est confirmé.',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
@@ -121,7 +121,7 @@ class SlotReservationService
                     'success' => false,
                     'message' => 'reservation introuvable',
                     'flashType' => 'danger',
-                    'flashMessage' => 'Impossible d\'annuler cette réservation.',
+                    'flashMessage' => 'Annulation impossible. La réservation est introuvable.',
                     'remainingPlaces' => $slot->getRemainingPlaces(),
                 ];
             }
@@ -143,7 +143,7 @@ class SlotReservationService
                     'l d F'
                 ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' a été annulé',
+                ) . ' est annulée.',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }

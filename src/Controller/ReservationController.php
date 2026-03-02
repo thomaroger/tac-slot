@@ -25,7 +25,7 @@ class ReservationController extends AbstractController
     {
 
         $numberOfReservations = $this->reservationService->cleanExpiredPendingReservations();
-        $this->addFlash('warning', $numberOfReservations . ' réservations perimées ont été supprimées.');
+        $this->addFlash('warning', $numberOfReservations . ' pré-réservation(s) expirée(s) annulée(s).');
 
         return $this->redirectToRoute('app_home');
     }
@@ -35,7 +35,7 @@ class ReservationController extends AbstractController
     {
 
         $numberOfNoShow = $this->reservationService->markNoShowReservations();
-        $this->addFlash('warning', $numberOfNoShow . ' réservations sans checkin mises à jour');
+        $this->addFlash('warning', $numberOfNoShow . ' réservation(s) passées en no-show.');
 
         return $this->redirectToRoute('app_home');
     }
@@ -56,12 +56,12 @@ class ReservationController extends AbstractController
         }
 
         if (! $this->reservationService->checkIn($reservation, $user)) {
-            $this->addFlash('danger', 'Vous ne pouvez pas checkin une reservation qui ne vous appartient pas');
+            $this->addFlash('danger', 'Check-in impossible. Cette réservation ne vous appartient pas.');
 
             return $this->redirectToRoute('app_home');
         }
 
-        $this->addFlash('success', 'CheckIn fait pour la réservation du créneau ' . $reservation->getSlot());
+        $this->addFlash('success', 'Check-in confirmé pour le créneau ' . $reservation->getSlot() . '.');
 
         return $this->redirectToRoute('app_home');
     }

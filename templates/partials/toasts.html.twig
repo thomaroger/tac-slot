@@ -1,0 +1,39 @@
+<div class="toast-container position-fixed top-0 end-0 p-3 app-toast-container" style="z-index: 1080;">
+    {% for label, messages in app.flashes %}
+        {% set tone = label %}
+        {% if tone == 'error' %}
+            {% set tone = 'danger' %}
+        {% elseif tone == 'message' %}
+            {% set tone = 'info' %}
+        {% endif %}
+
+        {% set delay = 4000 %}
+        {% if tone == 'success' %}
+            {% set delay = 3000 %}
+        {% elseif tone == 'warning' %}
+            {% set delay = 4500 %}
+        {% elseif tone == 'danger' %}
+            {% set delay = 7000 %}
+        {% endif %}
+
+        {% set icon = 'fa-circle-info' %}
+        {% if tone == 'success' %}
+            {% set icon = 'fa-circle-check' %}
+        {% elseif tone == 'warning' %}
+            {% set icon = 'fa-triangle-exclamation' %}
+        {% elseif tone == 'danger' %}
+            {% set icon = 'fa-circle-xmark' %}
+        {% endif %}
+
+        {% for message in messages %}
+            <div class="toast align-items-start border-0 app-toast app-toast-tone-{{ tone }}" role="status" aria-live="polite" aria-atomic="true" data-bs-delay="{{ delay }}">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fa-solid {{ icon }} me-2" aria-hidden="true"></i>{{ message }}
+                    </div>
+                    <button type="button" class="btn-close me-2 m-2" data-bs-dismiss="toast" aria-label="Fermer"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
