@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block email_title %}Les Archers du Faucigny{% endblock %}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f7fc;font-family:Arial,sans-serif;color:#1f2d3d;">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f3f7fc;padding:24px 12px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background-color:#ffffff;border:1px solid #d8e4f2;border-radius:14px;overflow:hidden;">
+                <tr>
+                    <td style="padding:18px 22px;background:linear-gradient(135deg,#ffffff 0%,#eef5ff 100%);border-bottom:1px solid #d8e4f2;">
+                        <div style="font-size:18px;font-weight:700;color:#1f3550;">Les Archers du Faucigny</div>
+                        <div style="font-size:13px;color:#5b6f85;margin-top:2px;">Réservation tir libre</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px 22px;font-size:15px;line-height:1.55;color:#1f2d3d;">
+                        {% block email_body %}{% endblock %}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:14px 22px;background-color:#f6f9fd;border-top:1px solid #dfe8f3;">
+                        <div style="font-size:12px;color:#64798f;">
+                            Les Archers du Faucigny | Réservation tir libre | &copy; {{ "now"|date("Y") }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

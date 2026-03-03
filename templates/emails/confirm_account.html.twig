@@ -1,18 +1,23 @@
-<p>Bonjour {{ adherent.firstName }} {{ adherent.lastName }},</p>
+{% extends 'emails/base_email.html.twig' %}
 
-<p>
-    Merci pour votre première connexion. Pour <strong>valider votre compte</strong>,
-    cliquez sur le lien ci-dessous :
-</p>
+{% block email_title %}Validation de votre compte{% endblock %}
 
-<p>
-    <a href="{{ absolute_url(path('app_verify_email', { token: token })) }}">
-        Valider mon compte
-    </a>
-</p>
-<p>
-    Si vous n’êtes pas à l’origine de cette action, vous pouvez ignorer cet email.
-</p>
-<p>
-    Les Archers du Faucigny - Système de réservation tir libre
-</p>
+{% block email_body %}
+    <p style="margin:0 0 14px;">Bonjour {{ adherent.firstName }} {{ adherent.lastName }},</p>
+
+    <p style="margin:0 0 12px;">
+        Merci pour votre première connexion. Pour <strong>valider votre compte</strong>,
+        cliquez sur le bouton ci-dessous.
+    </p>
+
+    <p style="margin:16px 0 16px;">
+        <a href="{{ absolute_url(path('app_verify_email', { token: token })) }}"
+           style="display:inline-block;background:#1d6fd2;border:1px solid #1457a8;border-radius:8px;color:#ffffff;text-decoration:none;font-weight:700;padding:10px 14px;">
+            Valider mon compte
+        </a>
+    </p>
+
+    <p style="margin:0;color:#5f7388;">
+        Si vous n’êtes pas à l’origine de cette action, vous pouvez ignorer cet email.
+    </p>
+{% endblock %}

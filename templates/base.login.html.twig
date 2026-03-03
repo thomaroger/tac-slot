@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Les Archers du Faucigny - Système de réservation tir libre</title>
+        <title>Les Archers du Faucigny - Réservation tir libre</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 
         <!-- CSS Bootstrap mobile-first -->
@@ -17,16 +17,27 @@
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         {% block stylesheets %}{% endblock %}
     </head>
-    <body class="bg-light d-flex flex-column min-vh-100">
-        <main class="container flex-grow-1 d-flex align-items-center justify-content-center">
-            <div class="w-100" style="max-width: 700px;">
+    <body class="bg-light d-flex flex-column min-vh-100 auth-layout">
+        <main class="container auth-container flex-grow-1 d-flex align-items-center justify-content-center">
+            <div class="w-100 auth-content">
                 {% block body %}{% endblock %}
             </div>
             {% include 'partials/toasts.html.twig' %}
         </main>
 
-        <footer class="text-center text-muted small py-3">
-            &copy; {{ "now"|date("Y") }} - Les Archers du Faucigny - Système de réservation tir libre
+        <footer class="app-footer-wrap">
+            <div class="container">
+                <div class="app-footer">
+                    <div class="app-footer-line">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Les Archers du Faucigny</span>
+                        <span class="app-footer-sep">|</span>
+                        <span>Réservation tir libre</span>
+                        <span class="app-footer-sep">|</span>
+                        <span>&copy; {{ "now"|date("Y") }}</span>
+                    </div>
+                </div>
+            </div>
         </footer>
 
         <!-- JS Bootstrap (pour le menu mobile) -->

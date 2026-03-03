@@ -218,6 +218,36 @@ class ReservationRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function countActiveAirKeyReservationsBySlot(Slot $slot): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->join('r.user', 'u')
+            ->where('r.slot = :slot')
+            ->andWhere('r.status IN (:statuses)')
+            ->andWhere('u.airKey = true')
+            ->setParameter('slot', $slot)
+            ->setParameter('statuses', [Reservation::STATUS_CONFIRMED, Reservation::STATUS_PENDING])
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return Reservation[]
+     */
+    public function findActiveReservationsBySlotWithUser(Slot $slot): array
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.user', 'u')
+            ->addSelect('u')
+            ->where('r.slot = :slot')
+            ->andWhere('r.status IN (:statuses)')
+            ->setParameter('slot', $slot)
+            ->setParameter('statuses', [Reservation::STATUS_CONFIRMED, Reservation::STATUS_PENDING])
+            ->getQuery()
+            ->getResult();
+    }
+
     public function countReservedAtInWindow(
         \DateTimeImmutable $start,
         \DateTimeImmutable $end,

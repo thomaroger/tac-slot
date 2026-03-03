@@ -1,48 +1,45 @@
 {% extends 'base.login.html.twig' %}
 
 {% block body %}
-	<div class="form-signin w-100 m-auto text-center">
-		<a href="/" style="color:black;text-decoration:none">
-			<p style="line-height:40px;">
-				<b>Les Archers du Faucigny - Système de réservation tir libre</b>
-			</p>
-		</a>
+    <div class="auth-shell mx-auto">
+        {% include 'security/_auth_header.html.twig' %}
 
-<section class="home-section mb-5">
+        <section class="home-section mb-3">
+            {% if slotopened == true %}
+                <div class="alert alert-success mb-0" role="alert">
+                    <h4 class="alert-heading">Salle ouverte</h4>
+                    <p class="mb-0">
+                        <strong>{{ slotReservations|length }} personne{% if slotReservations|length > 1 %}s{% endif %}</strong> présente{% if slotReservations|length > 1 %}s{% endif %}
+                        en salle sur
+                        <strong>{{ slotResa }} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.
+                    </p>
+                </div>
+            {% else %}
+                <div class="alert alert-danger mb-0" role="alert">
+                    <h4 class="alert-heading">Salle fermée</h4>
+                    <p class="mb-0">Aucun créneau n'est disponible à cette heure.</p>
+                </div>
+            {% endif %}
+        </section>
 
-	{% if slotopened == true %}
-		<div class="alert alert-success" role="alert">
-			<h4 class="alert-heading">Salle ouverte !</h4>
-			<p>
-				<strong>{{slotReservations|length}} personne{% if slotReservations|length > 1 %}s{% endif %}</strong> présente{% if slotReservations|length > 1 %}s
-				{% endif %}
-				en salle sur
-				<strong>{{slotResa}} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.</p>
-		</div>
-	{% endif %}
+        <section class="auth-card">
+            <div class="auth-card-head">
+                <h1 class="auth-card-title">Connexion</h1>
+                <p class="auth-card-subtitle">Utilisez votre numéro de licence ou votre email pour recevoir un code.</p>
+            </div>
 
-	{% if slotopened == false  %}
-		<div class="alert alert-danger" role="alert">
-			<h4 class="alert-heading">Salle fermée !</h4>
-			<p>Aucun créneau n'est disponible à cette heure</p>
-		</div>
-	{% endif %}
-</section>
+            <form action="{{ path('app_login') }}" method="post">
+                <div class="form-floating">
+                    <input type="text" name="identifier" id="identifier" class="form-control" required autofocus>
+                    <label for="identifier">Numéro de licence ou adresse email</label>
+                </div>
 
-
-
-		<form action="{{ path('app_login') }}" method="post">
-			<div class="form-floating">
-                <input type="text" name="identifier" id="identifier" class="form-control" required autofocus>
-				<label for="identifier">Saisissez votre <strong>numéro de licence</strong> ou votre <strong>adresse email</strong>.</label>
-			</div>
-			<div class="clearfix">&nbsp;</div>
-			
-			<div class="clearfix">&nbsp;</div>
-			<button class="w-100 btn btn-lg btn-primary" type="submit">Recevoir un code</button>
-		</form>
-	</div>
+                <div class="auth-form-actions">
+                    <button class="w-100 btn btn-primary btn-lg" type="submit">Recevoir un code</button>
+                </div>
+            </form>
+        </section>
+    </div>
 {% endblock %}
-
 
 

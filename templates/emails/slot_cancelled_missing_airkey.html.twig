@@ -1,0 +1,21 @@
+{% extends 'emails/base_email.html.twig' %}
+
+{% block email_title %}Annulation de réservation{% endblock %}
+
+{% block email_body %}
+    <p style="margin:0 0 14px;">Bonjour {{ adherent.firstName }} {{ adherent.lastName }},</p>
+
+    <p style="margin:0 0 12px;">
+        Votre réservation du créneau du
+        <strong>{{ slot.startAt|fr_date('l d F') }}</strong>
+        de <strong>{{ slot.startAt|date('H:i') }}</strong>
+        à <strong>{{ slot.endAt|date('H:i') }}</strong>
+        a été annulée.
+    </p>
+
+    <div style="background:#fff8e8;border:1px solid #f2d18a;color:#7a4f01;border-radius:8px;padding:10px 12px;margin:0 0 12px;">
+        Motif: il n’y a plus de personne avec AirKey disponible sur ce créneau pour ouvrir la salle.
+    </div>
+
+    <p style="margin:0;">Merci de réserver un autre créneau si besoin.</p>
+{% endblock %}

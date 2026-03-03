@@ -1,29 +1,28 @@
 {% extends 'base.login.html.twig' %}
 
 {% block body %}
-	<div class="form-signin w-100 m-auto text-center">
-		<a href="/" style="color:black;text-decoration:none">
-			<p style="line-height:40px;">
-				<b>Les Archers du Faucigny - Système de réservation tir libre</b>
-			</p>
-		</a>
-		<form action="{{ path('app_login_code') }}" method="post">
-			<div class="form-floating">
-                <input type="text" name="code" id="code" class="form-control" required autofocus>
-                <label for="code">
-                Entrez le <strong>code à 6 chiffres</strong> reçu par email.
-                Il est valable <strong>5 minutes</strong> et ne peut être utilisé qu’une seule fois.
-                </label>
-			</div>
-			
-			<div class="clearfix">&nbsp;</div>
-			<button type="submit" class="btn btn-primary">
-                Se connecter
-            </button>
-            <a href="{{ path('app_login') }}" class="btn btn-link">
-                Renvoyer un code
-            </a>
-		</form>
-	</div>
-{% endblock %}
+    <div class="auth-shell mx-auto">
+        {% include 'security/_auth_header.html.twig' %}
 
+        <section class="auth-card">
+            <div class="auth-card-head">
+                <h1 class="auth-card-title">Saisir le code</h1>
+                <p class="auth-card-subtitle">Entrez le code à 6 chiffres reçu par email.</p>
+            </div>
+
+            <form action="{{ path('app_login_code') }}" method="post">
+                <div class="form-floating">
+                    <input type="text" name="code" id="code" class="form-control" required autofocus inputmode="numeric" autocomplete="one-time-code">
+                    <label for="code">Code de connexion (6 chiffres)</label>
+                </div>
+
+                <p class="auth-help mb-0">Le code est valable 5 minutes et utilisable une seule fois.</p>
+
+                <div class="auth-form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Se connecter</button>
+                    <a href="{{ path('app_login') }}" class="btn btn-link auth-link-secondary">Renvoyer un code</a>
+                </div>
+            </form>
+        </section>
+    </div>
+{% endblock %}

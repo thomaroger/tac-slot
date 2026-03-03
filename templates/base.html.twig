@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Les Archers du Faucigny - Système de réservation tir libre</title>
+        <title>Les Archers du Faucigny - Réservation tir libre</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 
         <!-- CSS Bootstrap mobile-first -->
@@ -18,36 +18,47 @@
         {% block stylesheets %}{% endblock %}
     </head>
     <body class="bg-light">
-        <header class="navbar navbar-expand-lg navbar-dark bg-arc mb-3">
+        {% set currentRoute = app.request.attributes.get('_route')|default('') %}
+        <header class="app-navbar-wrap mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand fw-semibold" href="{{ path('app_home') }}">Les Archers du Faucigny - Système de réservation tir libre</a>
+                <nav class="navbar navbar-expand-lg navbar-light app-navbar">
+                <a class="navbar-brand app-brand" href="{{ path('app_home') }}">
+                    <span class="app-brand-mark"><i class="fa-solid fa-bullseye"></i></span>
+                    <span class="app-brand-text">
+                        <span class="app-brand-title">Les Archers du Faucigny</span>
+                        <span class="app-brand-subtitle">Réservation tir libre</span>
+                    </span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Afficher le menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <nav id="mainNavbar" class="collapse navbar-collapse">
-                    <ul class="navbar-nav ms-auto">
+                <div id="mainNavbar" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 app-nav-links">
                         {% if is_granted('ROLE_USER') %}
-                        <li class="nav-item">
-                            <span class="nav-link">{{user.firstName}} {{user.lastName}} {% if user.hasAirKey %} <i class="fa-solid fa-key">&nbsp;</i>{% endif %}  - {{user.level}}</span>
+                        <li class="nav-item app-user-pill mb-2 mb-lg-0">
+                            <span class="app-user-name">{{user.firstName}} {{user.lastName}}</span>
+                            <span class="app-user-level-badge">{{user.level}}</span>
+                            {% if user.hasAirKey %}<span class="app-user-airkey"><i class="fa-solid fa-key"></i> AirKey</span>{% endif %}
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link selected" href="{{ path('app_home') }}">Accueil</a>
+                            <a class="nav-link app-nav-link {{ currentRoute == 'app_home' ? 'is-active' : '' }}" href="{{ path('app_home') }}">Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('reservations_my') }}">Mes réservations</a>
+                            <a class="nav-link app-nav-link {{ currentRoute starts with 'reservations_' ? 'is-active' : '' }}" href="{{ path('reservations_my') }}">Mes réservations</a>
                         </li>
                         {% endif %}
                         {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item">
-                            <a class="nav-link" target="_blank" href="{{ path('admin') }}">Admin</a>
+                            <a class="nav-link app-nav-link {{ currentRoute starts with 'admin' ? 'is-active' : '' }}" target="_blank" href="{{ path('admin') }}">Admin</a>
                         </li>
                         {% endif %}
                         {% if is_granted('ROLE_USER') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter</a>
+                            <a class="nav-link app-nav-link app-nav-link-logout" href="{{ path('app_logout') }}">Se déconnecter</a>
                         </li>
                         {% endif %}
                     </ul>
+                </div>
                 </nav>
             </div>
         </header>
@@ -57,8 +68,19 @@
             {% include 'partials/toasts.html.twig' %}
         </main>
 
-        <footer class="text-center text-muted small py-3">
-            &copy; {{ "now"|date("Y") }} - Les Archers du Faucigny - Système de réservation tir libre
+        <footer class="app-footer-wrap">
+            <div class="container">
+                <div class="app-footer">
+                    <div class="app-footer-line">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>Les Archers du Faucigny</span>
+                        <span class="app-footer-sep"> - </span>
+                        <span>Réservation tir libre</span>
+                        <span class="app-footer-sep"> - </span>
+                        <span>&copy; {{ "now"|date("Y") }}</span>
+                    </div>
+                </div>
+            </div>
         </footer>
 
         <!-- JS Bootstrap (pour le menu mobile) -->

@@ -1,18 +1,21 @@
-<p>Bonjour {{ adherent.firstName }} {{ adherent.lastName }},</p>
+{% extends 'emails/base_email.html.twig' %}
 
-<p>Voici votre <strong>code de connexion</strong> :</p>
+{% block email_title %}Votre code de connexion{% endblock %}
 
-<p style="font-size: 24px; font-weight: bold;">
-    {{ code }}
-</p>
+{% block email_body %}
+    <p style="margin:0 0 14px;">Bonjour {{ adherent.firstName }} {{ adherent.lastName }},</p>
 
-<p>
-    Ce code est valable <strong>5 minutes</strong> et ne peut être utilisé qu’une seule fois.
-</p>
+    <p style="margin:0 0 12px;">Voici votre <strong>code de connexion</strong> :</p>
 
-<p>
-    Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet email.
-</p>
-<p>
-    Les Archers du Faucigny - Système de réservation tir libre
-</p>
+    <div style="display:inline-block;font-size:30px;font-weight:700;letter-spacing:4px;background:#eaf2ff;border:1px solid #b8ccea;color:#1e4e82;border-radius:10px;padding:10px 14px;margin:4px 0 12px;">
+        {{ code }}
+    </div>
+
+    <p style="margin:0 0 10px;">
+        Ce code est valable <strong>5 minutes</strong> et ne peut être utilisé qu’une seule fois.
+    </p>
+
+    <p style="margin:0;color:#5f7388;">
+        Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer cet email.
+    </p>
+{% endblock %}

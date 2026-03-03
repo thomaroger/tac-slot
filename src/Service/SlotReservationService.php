@@ -15,6 +15,7 @@ class SlotReservationService
 {
     public function __construct(
         private readonly ReservationRepository $reservationRepository,
+        private readonly ReservationMailer $reservationMailer,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -134,16 +135,85 @@ class SlotReservationService
             $this->em->persist($reservation);
             $this->em->flush();
 
+            if (! $slot->getRequiresAirKey()) {
+                return [
+                    'success' => true,
+                    'message' => 'ok',
+                    'flashType' => 'danger',
+                    'flashMessage' => 'La réservation du créneau du ' . FrenchDateFormatter::format(
+                        $slot->getStartAt(),
+                        'l d F'
+                    ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
+                        'H:i'
+                    ) . ' est annulée.',
+                    'remainingPlaces' => $slot->getRemainingPlaces(),
+                ];
+            }
+
+            $airKeyReservationsCount = $this->reservationRepository->countActiveAirKeyReservationsBySlot($slot);
+            if ($airKeyReservationsCount > 0) {
+                return [
+                    'success' => true,
+                    'message' => 'ok',
+                    'flashType' => 'danger',
+                    'flashMessage' => 'La réservation du créneau du ' . FrenchDateFormatter::format(
+                        $slot->getStartAt(),
+                        'l d F'
+                    ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
+                        'H:i'
+                    ) . ' est annulée.',
+                    'remainingPlaces' => $slot->getRemainingPlaces(),
+                ];
+            }
+
+            $reservationsToCancel = $this->reservationRepository->findActiveReservationsBySlotWithUser($slot);
+            if ($reservationsToCancel === []) {
+                return [
+                    'success' => true,
+                    'message' => 'ok',
+                    'flashType' => 'danger',
+                    'flashMessage' => 'La réservation du créneau du ' . FrenchDateFormatter::format(
+                        $slot->getStartAt(),
+                        'l d F'
+                    ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
+                        'H:i'
+                    ) . ' est annulée.',
+                    'remainingPlaces' => $slot->getRemainingPlaces(),
+                ];
+            }
+
+            $cancelledAt = new \DateTimeImmutable();
+
+            foreach ($reservationsToCancel as $reservationToCancel) {
+                $reservationToCancel->setStatus(Reservation::STATUS_CANCELLED);
+                $reservationToCancel->setCancelledAt($cancelledAt);
+                $this->em->persist($reservationToCancel);
+            }
+
+            $slot->setReservedPlaces(0);
+            $this->em->persist($slot);
+            $this->em->flush();
+
+            foreach ($reservationsToCancel as $reservationToCancel) {
+                $email = $reservationToCancel->getUser()
+                    ->getEmail();
+                if (! is_string($email) || trim($email) === '') {
+                    continue;
+                }
+
+                $this->reservationMailer->sendSlotCancelledMissingAirKey($reservationToCancel->getUser(), $slot);
+            }
+
             return [
                 'success' => true,
                 'message' => 'ok',
-                'flashType' => 'danger',
-                'flashMessage' => 'La réservation du créneau du ' . FrenchDateFormatter::format(
+                'flashType' => 'warning',
+                'flashMessage' => 'Le créneau du ' . FrenchDateFormatter::format(
                     $slot->getStartAt(),
                     'l d F'
                 ) . ' ' . $slot->getStartAt()->format('H:i') . ' - ' . $slot->getEndAt()->format(
                     'H:i'
-                ) . ' est annulée.',
+                ) . ' a été annulé pour tout le monde : plus aucune AirKey disponible pour ouvrir la salle.',
                 'remainingPlaces' => $slot->getRemainingPlaces(),
             ];
         }
