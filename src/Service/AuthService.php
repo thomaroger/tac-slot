@@ -65,7 +65,8 @@ class AuthService
         $slot = $this->slotRepository->findCurrentSlotWithReservations($now);
 
         $slotReservations = [];
-        $slotopened = $slot !== null;
+        $slot !== null;
+        $slotopened = false;
         $slotResa = 0;
 
         if ($slot !== null) {
@@ -75,6 +76,7 @@ class AuthService
                 }
                 if ($reservation->getStatus() === Reservation::STATUS_CONFIRMED) {
                     $slotResa++;
+                    $slotopened = true;
                 }
             }
         }

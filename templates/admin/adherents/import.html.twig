@@ -7,23 +7,105 @@
         <h1 class="h3 mb-3">Import des adhérents / licenciés</h1>
 
         <p class="text-muted">
-            Importez un fichier <strong>CSV</strong> (vous pouvez l’exporter depuis Excel)
-            avec les colonnes suivantes&nbsp;:
+            Importez un fichier <strong>CSV</strong> (séparateur <code>;</code> ou <code>,</code>, export Excel possible)
+            avec les colonnes suivantes.
+            Les intitulés sont flexibles (accents/majuscules/espaces ignorés).
+        </p>
+        <p class="text-muted">
+            La ligne technique <code>Column1...Column10</code> (souvent ajoutée par certains exports) est acceptée et ignorée automatiquement.
         </p>
         <ul>
-            <li><code>Prenom</code> ou <code>Prénom</code></li>
-            <li><code>Nom</code></li>
-            <li><code>Numero de licence</code> ou <code>Numéro de licence</code></li>
-            <li><code>Email</code></li>
-            <li><code>Niveau</code> (National, Régional, Départemental, Débutant/Loisirs, Droit de Paille)</li>
-            <li><code>Air key</code> (oui/non)</li>
-            <li><code>Role</code> ou <code>Rôle</code> (utilisateur, administrateur)</li>
+            <li><strong>Obligatoire</strong> : <code>Numero de licence</code> (ou <code>numero_licence</code>, <code>licence</code>)</li>
+            <li><strong>Identité</strong> : <code>Prenom</code>, <code>Nom</code>, <code>Email</code></li>
+            <li><strong>Niveau</strong> : <code>Niveau</code></li>
+            <li><strong>Accès salle</strong> : <code>Air key</code> / <code>air_key</code>, <code>Tir libre</code> / <code>can_open_shoot</code></li>
+            <li><strong>Statut compte</strong> : <code>Actif</code> / <code>email_verified</code></li>
+            <li><strong>Rôle</strong> : <code>Role</code> (utilisateur, administrateur)</li>
+            <li><strong>Suppression logique</strong> : <code>supprime</code> / <code>deleted</code> (optionnel)</li>
         </ul>
 
         <p class="text-muted">
             Les lignes sont <strong>créées ou mises à jour</strong> à partir du
             <strong>numéro de licence</strong>.
         </p>
+        <p class="text-muted">
+            Valeurs booléennes acceptées : <code>1</code>, <code>true</code>, <code>vrai</code>, <code>oui</code>, <code>actif</code>.
+            Toute autre valeur est interprétée comme <strong>non</strong>.
+        </p>
+        <p class="mb-3">
+            <a href="{{ path('admin_adherents_import_example') }}" class="btn btn-outline-primary btn-sm">
+                Télécharger un CSV d'exemple
+            </a>
+        </p>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Colonnes et valeurs possibles</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                        <tr>
+                            <th>Colonne logique</th>
+                            <th>Alias acceptés (exemples)</th>
+                            <th>Valeurs possibles</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><code>numero_licence</code></td>
+                            <td><code>Numero de licence</code>, <code>numero_licence_fftir</code>, <code>licence</code></td>
+                            <td>Texte non vide (unique) - obligatoire</td>
+                        </tr>
+                        <tr>
+                            <td><code>prenom</code></td>
+                            <td><code>Prenom</code>, <code>firstname</code>, <code>first_name</code></td>
+                            <td>Texte libre</td>
+                        </tr>
+                        <tr>
+                            <td><code>nom</code></td>
+                            <td><code>Nom</code>, <code>lastname</code>, <code>last_name</code></td>
+                            <td>Texte libre</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td><code>Email</code>, <code>mail</code></td>
+                            <td>Email valide conseillé (mis en minuscule)</td>
+                        </tr>
+                        <tr>
+                            <td><code>niveau</code></td>
+                            <td><code>Niveau</code>, <code>level</code></td>
+                            <td>National, Régional, Départemental, Débutant/Loisirs, Droit de Paille</td>
+                        </tr>
+                        <tr>
+                            <td><code>air_key</code></td>
+                            <td><code>Air key</code>, <code>Air Key</code>, <code>airkey</code></td>
+                            <td>Booléen</td>
+                        </tr>
+                        <tr>
+                            <td><code>can_open_shoot</code></td>
+                            <td><code>Tir libre</code>, <code>tir_libre</code>, <code>can_open_shoot</code>, <code>autorise_tir_libre</code></td>
+                            <td>Booléen</td>
+                        </tr>
+                        <tr>
+                            <td><code>email_verified</code></td>
+                            <td><code>Actif</code>, <code>active</code>, <code>email_verified</code></td>
+                            <td>Booléen</td>
+                        </tr>
+                        <tr>
+                            <td><code>role</code></td>
+                            <td><code>Role</code>, <code>Rôle</code></td>
+                            <td><code>utilisateur</code> ou <code>administrateur</code> (admin accepté)</td>
+                        </tr>
+                        <tr>
+                            <td><code>deleted</code></td>
+                            <td><code>supprime</code>, <code>supprime_le</code>, <code>deleted</code>, <code>deleted_at</code></td>
+                            <td>Booléen (oui: suppression logique, non: restauration)</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <form method="post" enctype="multipart/form-data" class="mt-3">
             <div class="mb-3">
@@ -33,6 +115,79 @@
             <button type="submit" class="btn btn-primary">Importer</button>
             <a href="{{ path('admin') }}" class="btn btn-outline-secondary">Retour au tableau de bord</a>
         </form>
+
+        {% if report is not null %}
+            <section class="mt-4">
+                <h2 class="h5 mb-3">Résultat de l’import</h2>
+                <div class="row g-2 mb-3">
+                    <div class="col-6 col-md-2">
+                        <div class="card text-center">
+                            <div class="card-body py-2">
+                                <div class="small text-muted">Lignes</div>
+                                <div class="fw-bold">{{ report.total_rows }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card text-center">
+                            <div class="card-body py-2">
+                                <div class="small text-muted">Traitées</div>
+                                <div class="fw-bold">{{ report.processed }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card text-center">
+                            <div class="card-body py-2">
+                                <div class="small text-muted">Créées</div>
+                                <div class="fw-bold text-success">{{ report.created }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card text-center">
+                            <div class="card-body py-2">
+                                <div class="small text-muted">Mises à jour</div>
+                                <div class="fw-bold text-primary">{{ report.updated }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="card text-center">
+                            <div class="card-body py-2">
+                                <div class="small text-muted">Ignorées</div>
+                                <div class="fw-bold text-warning">{{ report.ignored }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if report.errors is not empty %}
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning-subtle fw-semibold">Lignes ignorées / erreurs</div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Ligne</th>
+                                        <th>Motif</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in report.errors %}
+                                        <tr>
+                                            <td>{{ item.line }}</td>
+                                            <td>{{ item.reason }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
     </section>
 {% endblock %}
-

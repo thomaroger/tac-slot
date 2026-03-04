@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -142,6 +143,7 @@ class AdherentCrudController extends AbstractCrudController
     public function import(Request $request): Response
     {
         $flashBag = $this->getFlashBag();
+        $report = null;
 
         if ($request->isMethod('POST')) {
             /** @var UploadedFile|null $file */
@@ -149,14 +151,91 @@ class AdherentCrudController extends AbstractCrudController
             if (! $file instanceof UploadedFile) {
                 $flashBag?->add('danger', 'Aucun fichier n’a été envoyé.');
             } else {
-                $count = $this->adherentImportService->importCsvFile($file);
-                $flashBag?->add('success', sprintf('%d adhérent(s) importé(s) / mis à jour.', $count));
-
-                return $this->redirectToRoute('admin');
+                $report = $this->adherentImportService->importCsvFile($file);
+                $flashBag?->add(
+                    'success',
+                    sprintf(
+                        'Import terminé: %d traité(s) (%d créés, %d mis à jour, %d ignorés).',
+                        $report['processed'],
+                        $report['created'],
+                        $report['updated'],
+                        $report['ignored']
+                    )
+                );
             }
         }
 
-        return $this->render('admin/adherents/import.html.twig');
+        return $this->render('admin/adherents/import.html.twig', [
+            'report' => $report,
+        ]);
+    }
+
+    #[Route('/admin/adherents/import/example.csv', name: 'admin_adherents_import_example')]
+    public function downloadImportExample(): StreamedResponse
+    {
+        $response = new StreamedResponse(function (): void {
+            $output = fopen('php://output', 'w');
+            if ($output === false) {
+                return;
+            }
+
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv(
+                $output,
+                [
+                    'Numero de licence',
+                    'Prenom',
+                    'Nom',
+                    'Email',
+                    'Niveau',
+                    'Air key',
+                    'Tir libre',
+                    'Actif',
+                    'Role',
+                    'supprime',
+                ],
+                ';'
+            );
+            fputcsv(
+                $output,
+                [
+                    '1234567A',
+                    'Thomas',
+                    'Roger',
+                    'thomas.roger@example.org',
+                    'National',
+                    'oui',
+                    'oui',
+                    'oui',
+                    'administrateur',
+                    'non',
+                ],
+                ';'
+            );
+            fputcsv(
+                $output,
+                [
+                    '7654321B',
+                    'Emma',
+                    'Martin',
+                    'emma.martin@example.org',
+                    'Departemental',
+                    'non',
+                    'oui',
+                    'oui',
+                    'utilisateur',
+                    'non',
+                ],
+                ';'
+            );
+
+            fclose($output);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="exemple_import_adherents.csv"');
+
+        return $response;
     }
 
     private function getFlashBag(): ?FlashBagInterface

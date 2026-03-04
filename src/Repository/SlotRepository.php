@@ -18,12 +18,11 @@ class SlotRepository extends ServiceEntityRepository
         parent::__construct($registry, Slot::class);
     }
 
-    public function hasAnySlotBetween(\DateTimeImmutable $start, \DateTimeImmutable $end): bool
+    public function hasAnySlotBetween(\DateTimeImmutable $end): bool
     {
         $slotId = $this->createQueryBuilder('s')
             ->select('s.id')
-            ->where('s.startAt BETWEEN :start AND :end')
-            ->setParameter('start', $start)
+            ->where('s.startAt >= :end')
             ->setParameter('end', $end)
             ->setMaxResults(1)
             ->getQuery()

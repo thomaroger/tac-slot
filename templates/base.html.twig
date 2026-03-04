@@ -36,9 +36,9 @@
                     <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 app-nav-links">
                         {% if is_granted('ROLE_USER') %}
                         <li class="nav-item app-user-pill mb-2 mb-lg-0">
-                            <span class="app-user-name">{{user.firstName}} {{user.lastName}}</span>
-                            <span class="app-user-level-badge">{{user.level}}</span>
-                            {% if user.hasAirKey %}<span class="app-user-airkey"><i class="fa-solid fa-key"></i> AirKey</span>{% endif %}
+                            <span class="app-user-name">{{ app.user.firstName }} {{ app.user.lastName }}</span>
+                            <span class="app-user-level-badge">{{ app.user.level }}</span>
+                            {% if app.user.hasAirKey %}<span class="app-user-airkey"><i class="fa-solid fa-key"></i> AirKey</span>{% endif %}
                         </li>
                         <li class="nav-item">
                             <a class="nav-link app-nav-link {{ currentRoute == 'app_home' ? 'is-active' : '' }}" href="{{ path('app_home') }}">Accueil</a>

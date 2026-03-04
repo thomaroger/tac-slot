@@ -24,10 +24,9 @@ class HomeService
     public function buildHomeData(Adherent $user): array
     {
         $today = new \DateTimeImmutable('today');
-        $todayPlus4 = new \DateTimeImmutable('+13 days');
         $limit = $today->modify('+14 days');
 
-        if (! $this->slotRepository->hasAnySlotBetween($todayPlus4, $limit)) {
+        if (! $this->slotRepository->hasAnySlotBetween($limit)) {
             return [
                 'redirectRoute' => 'generate_slots',
                 'viewData' => [],
@@ -64,7 +63,8 @@ class HomeService
         $slot = $this->slotRepository->findCurrentSlotWithReservations($now);
 
         $slotReservations = [];
-        $slotopened = $slot !== null;
+        $slot !== null;
+        $slotopened = false;
         $slotResa = 0;
 
         if ($slot !== null) {
@@ -74,6 +74,7 @@ class HomeService
                 }
                 if ($reservation->getStatus() === Reservation::STATUS_CONFIRMED) {
                     $slotResa++;
+                    $slotopened = true;
                 }
             }
         }
