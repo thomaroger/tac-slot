@@ -712,6 +712,25 @@ small,
     padding: 1rem;
 }
 
+.js-reservation-filter {
+    border: 1px solid #d5d9de;
+    background: #f6f7f8;
+    color: #5f6770;
+}
+
+.js-reservation-filter:hover,
+.js-reservation-filter:focus {
+    border-color: #9fd8ae;
+    background: #f3fbf6;
+    color: #155724;
+}
+
+.js-reservation-filter.is-active {
+    border-color: #9ec5fe;
+    background: #e7f1ff;
+    color: #0a58ca;
+}
+
 .btn:focus-visible,
 a:focus-visible,
 .accordion-button:focus-visible,

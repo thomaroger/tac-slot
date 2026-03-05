@@ -74,7 +74,7 @@
 
 
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4" id="my-reservations-accordion">
     <h2 class="mb-4 fw-bold">Mes réservations</h2>
     <div class="card reservation-section-card">
         <div class="card-header p-0">
@@ -90,8 +90,15 @@
                 <i class="fa-solid fa-chevron-down reservation-toggle-icon" aria-hidden="true"></i>
             </button>
         </div>
-        <div id="current-reservations-collapse" class="collapse show">
-            <div class="card-body">
+        <div id="current-reservations-collapse" class="collapse show" data-bs-parent="#my-reservations-accordion">
+            <div class="card-body js-reservation-period" data-filter-group="current">
+                <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center">
+                    <button type="button" class="btn btn-sm js-reservation-filter is-active" data-filter-group="current" data-filter-status="all">Toutes</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="current" data-filter-status="confirmed_checkin">Check-in</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="current" data-filter-status="no_show">No-show</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="current" data-filter-status="confirmed">Confirmée</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="current" data-filter-status="cancelled">Annulée</button>
+                </div>
              {% for reservation in current_reservations %}
                 {% set reservationState = 'normal' %}
                     {% if reservation.status == 'confirmed' %}
@@ -101,7 +108,11 @@
                     {% elseif reservation.status == 'no_show' %}
                         {% set reservationState = 'closed' %}
                     {% endif %}
-                    <div class="card slot-card slot-state-{{ reservationState }} mt-2" id=''>
+                    {% set quickStatus = reservation.status %}
+                    {% if reservation.status == 'confirmed' and reservation.isCheckedIn == true %}
+                        {% set quickStatus = 'confirmed_checkin' %}
+                    {% endif %}
+                    <div class="card slot-card slot-state-{{ reservationState }} mt-2 js-reservation-item" data-filter-group="current" data-reservation-status="{{ quickStatus }}" id=''>
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -143,8 +154,13 @@
                 <i class="fa-solid fa-chevron-down reservation-toggle-icon" aria-hidden="true"></i>
             </button>
         </div>
-        <div id="future-reservations-collapse" class="collapse">
-            <div class="card-body">
+        <div id="future-reservations-collapse" class="collapse" data-bs-parent="#my-reservations-accordion">
+            <div class="card-body js-reservation-period" data-filter-group="future">
+                <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center">
+                    <button type="button" class="btn btn-sm js-reservation-filter is-active" data-filter-group="future" data-filter-status="all">Toutes</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="future" data-filter-status="confirmed">Confirmée</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="future" data-filter-status="cancelled">Annulée</button>
+                </div>
          {% for reservation in futur_reservations %}
                 {% set reservationState = 'normal' %}
                     {% if reservation.status == 'confirmed' %}
@@ -154,7 +170,11 @@
                     {% elseif reservation.status == 'no_show' %}
                         {% set reservationState = 'closed' %}
                     {% endif %}
-                    <div class="card slot-card slot-state-{{ reservationState }} mt-2" id=''>
+                    {% set quickStatus = reservation.status %}
+                    {% if reservation.status == 'confirmed' and reservation.isCheckedIn == true %}
+                        {% set quickStatus = 'confirmed_checkin' %}
+                    {% endif %}
+                    <div class="card slot-card slot-state-{{ reservationState }} mt-2 js-reservation-item" data-filter-group="future" data-reservation-status="{{ quickStatus }}" id=''>
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -193,8 +213,14 @@
                 <i class="fa-solid fa-chevron-down reservation-toggle-icon" aria-hidden="true"></i>
             </button>
         </div>
-        <div id="past-reservations-collapse" class="collapse">
-            <div class="card-body">
+        <div id="past-reservations-collapse" class="collapse" data-bs-parent="#my-reservations-accordion">
+            <div class="card-body js-reservation-period" data-filter-group="past">
+                <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center">
+                    <button type="button" class="btn btn-sm js-reservation-filter is-active" data-filter-group="past" data-filter-status="all">Toutes</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="past" data-filter-status="confirmed_checkin">Check-in</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="past" data-filter-status="no_show">No-show</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="past" data-filter-status="cancelled">Annulée</button>
+                </div>
             {% for reservation in past_reservations %}
                 {% set reservationState = 'normal' %}
                     {% if reservation.status == 'confirmed' %}
@@ -204,7 +230,11 @@
                     {% elseif reservation.status == 'no_show' %}
                         {% set reservationState = 'closed' %}
                     {% endif %}
-                    <div class="card slot-card slot-state-{{ reservationState }} mt-2" id=''>
+                    {% set quickStatus = reservation.status %}
+                    {% if reservation.status == 'confirmed' and reservation.isCheckedIn == true %}
+                        {% set quickStatus = 'confirmed_checkin' %}
+                    {% endif %}
+                    <div class="card slot-card slot-state-{{ reservationState }} mt-2 js-reservation-item" data-filter-group="past" data-reservation-status="{{ quickStatus }}" id=''>
                         <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
