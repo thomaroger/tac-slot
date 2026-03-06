@@ -19,17 +19,23 @@ class HomeService
     }
 
     /**
-     * @return array{redirectRoute: string|null, viewData: array<string, mixed>}
+     * @return array{
+     *     redirectRoute: string|null,
+     *     viewData: array<string, mixed>,
+     *     flashes: list<array{type: string, message: string}>
+     * }
      */
     public function buildHomeData(Adherent $user): array
     {
         $today = new \DateTimeImmutable('today');
         $limit = $today->modify('+14 days');
+        $flashes = [];
 
         if (! $this->slotRepository->hasAnySlotBetween($limit)) {
             return [
                 'redirectRoute' => 'generate_slots',
                 'viewData' => [],
+                'flashes' => [],
             ];
         }
 
@@ -37,16 +43,25 @@ class HomeService
             new \DateTimeImmutable('-2 minutes')
         );
         if (! empty($expiredReservations)) {
-            $this->reservationService->cleanExpiredPendingReservations();
+            $numberOfExpiredReservations = $this->reservationService->cleanExpiredPendingReservations();
+            $flashes[] = [
+                'type' => 'warning',
+                'message' => $numberOfExpiredReservations . ' pré-réservation(s) expirée(s) annulée(s).',
+            ];
         }
 
         $noShowReservations = $this->reservationRepository->findNoShowCandidates(new \DateTimeImmutable());
         if (! empty($noShowReservations)) {
-            $this->reservationService->markNoShowReservations();
+            $numberOfNoShowReservations = $this->reservationService->markNoShowReservations();
+            $flashes[] = [
+                'type' => 'warning',
+                'message' => $numberOfNoShowReservations . ' réservation(s) passées en no-show.',
+            ];
         }
 
-        $reservationStart = $this->getReservationDelay($user);
-        $slots = $this->slotRepository->findReservableSlotsForPeriod($today, $limit, $reservationStart);
+        $reservationDelay = $this->getReservationDelay($user);
+        $now = new \DateTimeImmutable();
+        $slots = $this->slotRepository->findReservableSlotsForPeriod($now, $limit, $reservationDelay);
 
         $slotsByDay = [];
         foreach ($slots as $slot) {
@@ -63,11 +78,10 @@ class HomeService
         $slot = $this->slotRepository->findCurrentSlotWithReservations($now);
 
         $slotReservations = [];
-        $slot !== null;
         $slotopened = false;
         $slotResa = 0;
 
-        if ($slot !== null) {
+        if (! empty($slot)) {
             foreach ($slot->getReservations() as $reservation) {
                 if ($reservation->isCheckedIn()) {
                     $slotReservations[] = $reservation;
@@ -91,6 +105,7 @@ class HomeService
                 'slotReservations' => $slotReservations,
                 'slotResa' => $slotResa,
             ],
+            'flashes' => $flashes,
         ];
     }
 

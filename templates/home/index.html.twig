@@ -9,20 +9,21 @@
             <h2 class="home-section-title mb-0">État de la salle</h2>
         </div>
 
+    <div class="home-live-stack">
     {% if slotnow %}
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-warning home-status-alert home-status-checkin" role="alert">
         <h4 class="alert-heading"><i class="fa-solid fa-map-pin"></i> <strong>Votre séance est en cours</strong></h4>
         <p>Pensez à faire votre check-in.</p>
         <form method="post" action="{{ path('reservation_check', {id: slotnow.id}) }}" class="float-end">
             <input type="hidden" name="_token" value="{{ csrf_token('reservation_check_' ~ slotnow.id) }}">
-            <button class="btn btn-dark btn-sm" id="checkinBtn" type="submit">Check-in</button>
+            <button class="btn btn-dark btn-sm home-checkin-btn" id="checkinBtn" type="submit">Check-in</button>
         </form>
         <div class="clearfix">&nbsp;</div>
     </div>
     {% endif %}
 
     {% if slotopened == true %}
-        <div class="alert alert-success" role="alert">
+        <div class="alert alert-success home-status-alert home-status-open" role="alert">
         <h4 class="alert-heading">Salle ouverte !</h4>
         <p><strong>{{slotReservations|length}} personne{% if slotReservations|length > 1 %}s{% endif %}</strong> présente{% if slotReservations|length > 1 %}s{% endif %} en salle sur <strong>{{slotResa}} inscrite{% if slotResa > 1 %}s{% endif %}</strong>.</p>
         <hr>
@@ -44,11 +45,12 @@
     {% endif %}
     
     {% if slotopened == false  %}
-        <div class="alert alert-danger" role="alert">
+        <div class="alert alert-danger home-status-alert home-status-closed" role="alert">
             <h4 class="alert-heading">Salle fermée !</h4>
             <p>Aucun créneau n'est disponible à cette heure</p>
         </div>
     {% endif %}
+    </div>
     </section>
 
     <section class="home-section">
@@ -89,9 +91,9 @@
                             {% endif %}
 
                             <div class="card slot-card slot-state-{{ slotState }} mb-2 mb-md-3 p-2 p-md-3 rounded-3" id='slot-{{slot.id}}'>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ slot.startAt|date('H:i') }} - {{ slot.endAt|date('H:i') }}</strong><br>
+                                <div class="slot-card-content d-flex justify-content-between align-items-center">
+                                    <div class="slot-card-meta">
+                                        <strong class="slot-card-time">{{ slot.startAt|date('H:i') }} - {{ slot.endAt|date('H:i') }}</strong><br>
                                        {% if slot.isReservedBy(app.user) %}
                                             <div>{{ remaining }} / {{ slot.maxPlaces }} places</div>
                                             <div class="status-badges mt-1">
@@ -118,7 +120,7 @@
                                             {% endif %}
                                         {% endif %}
                                     </div>
-                                    <div>
+                                    <div class="slot-card-action">
                                         {% if slot.isReservedBy(app.user)  %}
                                             {% if slot.canBeCancelled %}
                                             <button class="btn btn-outline-danger btn-sm cancelledReservation" 

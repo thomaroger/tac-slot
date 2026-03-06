@@ -159,12 +159,16 @@
                 <div class="d-flex flex-wrap gap-2 mb-3 justify-content-center">
                     <button type="button" class="btn btn-sm js-reservation-filter is-active" data-filter-group="future" data-filter-status="all">Toutes</button>
                     <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="future" data-filter-status="confirmed">Confirmée</button>
+                    <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="future" data-filter-status="pending">En cours</button>
+
                     <button type="button" class="btn btn-sm js-reservation-filter" data-filter-group="future" data-filter-status="cancelled">Annulée</button>
                 </div>
          {% for reservation in futur_reservations %}
                 {% set reservationState = 'normal' %}
                     {% if reservation.status == 'confirmed' %}
                         {% set reservationState = 'reserved' %}
+                    {% elseif reservation.status == 'pending' %}
+                        {% set reservationState = 'closed' %}
                     {% elseif reservation.status == 'cancelled' %}
                         {% set reservationState = 'pending' %}
                     {% elseif reservation.status == 'no_show' %}
@@ -185,8 +189,8 @@
                                     <span class="status-badge badge-reserved">Réservé</span>
                                 {% elseif reservation.status == 'cancelled' %}
                                     <span class="status-badge badge-pending">Annulé</span>
-                                {% elseif reservation.status == 'no_show' %}
-                                    <span class="status-badge badge-noshow">No-show</span>
+                                {% elseif reservation.status == 'pending' %}
+                                    <span class="status-badge badge-noshow">En cours</span>
                                 {% else %}
                                     <span class="status-badge badge-neutral">{{ reservation.status|capitalize }}</span>
                                 {% endif %}

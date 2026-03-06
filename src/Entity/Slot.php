@@ -23,6 +23,9 @@ class Slot
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $endAt;
 
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
     #[ORM\Column(type: 'integer')]
     private int $maxPlaces = 12;
 
@@ -43,6 +46,7 @@ class Slot
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable();
         $this->reservations = new ArrayCollection();
     }
 
@@ -78,6 +82,11 @@ class Slot
         return $this->endAt;
     }
 
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
     public function getMaxPlaces(): int
     {
         return $this->maxPlaces;
@@ -108,6 +117,13 @@ class Slot
     public function setEndAt(\DateTimeImmutable $endAt): self
     {
         $this->endAt = $endAt;
+
+        return $this;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

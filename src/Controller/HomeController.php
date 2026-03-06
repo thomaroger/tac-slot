@@ -27,6 +27,10 @@ class HomeController extends AbstractController
 
         $result = $this->homeService->buildHomeData($user);
 
+        foreach ($result['flashes'] as $flash) {
+            $this->addFlash($flash['type'], $flash['message']);
+        }
+
         if ($result['redirectRoute'] !== null) {
             return $this->redirectToRoute($result['redirectRoute']);
         }

@@ -399,7 +399,7 @@ small,
     font-size: var(--type-small);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #6c757d;
+    color: #4f5f70;
     font-weight: var(--type-emphasis-weight);
 }
 
@@ -412,8 +412,35 @@ small,
 
 .home-page .home-section-subtitle {
     margin-top: 0.35rem;
-    color: #6c757d;
+    color: #4f5f70;
     font-size: var(--type-small);
+}
+
+.home-live-stack {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.home-status-alert {
+    border-width: 1px;
+    border-radius: 12px;
+}
+
+.home-status-checkin {
+    background: linear-gradient(135deg, #fff8e8 0%, #fff2c9 100%);
+}
+
+.home-status-open {
+    background: linear-gradient(135deg, #ebf8ef 0%, #dff4e7 100%);
+}
+
+.home-status-closed {
+    background: linear-gradient(135deg, #fdecee 0%, #f9e1e4 100%);
+}
+
+.home-checkin-btn {
+    min-width: 110px;
+    font-weight: 700;
 }
 
 .home-page .alert:last-child {
@@ -466,6 +493,24 @@ small,
     border: 1px solid #e9ecef;
     background-color: #ffffff;
     color: #212529;
+}
+
+.slot-card-content {
+    gap: 0.75rem;
+}
+
+.slot-card-meta {
+    min-width: 0;
+}
+
+.slot-card-time {
+    font-size: 1rem;
+    color: #1b2838;
+}
+
+.slot-card-action {
+    display: flex;
+    align-items: center;
 }
 
 .slot-card:hover {
@@ -794,4 +839,29 @@ a:focus-visible,
     border-color: #d5d9de !important;
     background: #f6f7f8;
     color: #5f6770;
+}
+
+@media (max-width: 576px) {
+    .app-toast-container {
+        top: auto !important;
+        right: auto !important;
+        left: 50% !important;
+        bottom: 0.8rem;
+        transform: translateX(-50%);
+        width: min(94vw, 420px);
+        padding: 0.5rem !important;
+    }
+
+    .slot-card-content {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .slot-card-action {
+        width: 100%;
+    }
+
+    .slot-card-action .btn {
+        width: 100%;
+    }
 }
