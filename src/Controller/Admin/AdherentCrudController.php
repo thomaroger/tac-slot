@@ -54,7 +54,8 @@ class AdherentCrudController extends AbstractCrudController
             ->setDefaultSort([
                 'lastName' => 'ASC',
                 'firstName' => 'ASC',
-            ]);
+            ])
+            ->setPaginatorPageSize(100);
     }
 
     public function configureFields(string $pageName): iterable
